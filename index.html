@@ -5,408 +5,490 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>BazarPlus - Gestão de Bazares e Créditos</title>
     
-    <link rel="stylesheet" href="styles.css">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css"> 
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
 </head>
 <body>
-    <div class="container">
+    
+    <main class="main-content">
         <header class="header">
-            <h1><i class="fas fa-store-alt"></i> BazarPlus</h1>
-            <div class="header-right">
-                <button id="exportData" class="btn btn-info"><i class="fas fa-download"></i> Exportar Dados (Ctrl+E)</button>
-                <div class="theme-toggle">
-                    <input type="checkbox" id="dark-mode-toggle" class="dark-mode-toggle">
-                    <label for="dark-mode-toggle" class="toggle-label"></label>
+            <h1>BazarKimika - Gestão de Bazares e Créditos</h1>
+            <div class="header-actions">
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="user-info">
+                    Olá, FRAN
+                    <img src="https://via.placeholder.com/40/8b5cf6/ffffff?text=LP" alt="User Avatar">
                 </div>
             </div>
         </header>
 
-        <nav class="tabs-nav">
+        <nav class="tab-nav">
             <button class="tab-button active" onclick="openTab(event, 'dashboard')"><i class="fas fa-chart-line"></i> Dashboard</button>
-            <button class="tab-button" onclick="openTab(event, 'vendas')"><i class="fas fa-cash-register"></i> Vendas</button>
-            <button class="tab-button" onclick="openTab(event, 'itens')"><i class="fas fa-boxes"></i> Itens</button>
-            <button class="tab-button" onclick="openTab(event, 'consignatarios')"><i class="fas fa-user-tag"></i> Consignatários</button>
-            <button class="tab-button" onclick="openTab(event, 'compradores')"><i class="fas fa-shopping-cart"></i> Compradores</button>
-            <button class="tab-button" onclick="openTab(event, 'bazares')"><i class="fas fa-calendar-alt"></i> Bazares</button>
-            <button class="tab-button" onclick="openTab(event, 'relatorios')"><i class="fas fa-file-alt"></i> Relatórios</button>
-            <button class="tab-button" onclick="openTab(event, 'config')"><i class="fas fa-cog"></i> Configurações</button>
+            <button class="tab-button" onclick="openTab(event, 'bazares')"><i class="fas fa-store"></i> Bazares</button>
+            <button class="tab-button" onclick="openTab(event, 'itens')"><i class="fas fa-tags"></i> Itens</button>
+            <button class="tab-button" onclick="openTab(event, 'consignatarios')"><i class="fas fa-handshake"></i> Consignatários</button>
+            <button class="tab-button" onclick="openTab(event, 'compradores')"><i class="fas fa-users"></i> Compradores</button>
+            <button class="tab-button" onclick="openTab(event, 'vendas')"><i class="fas fa-shopping-cart"></i> Vendas</button>
+            <button class="tab-button" onclick="openTab(event, 'consumos')"><i class="fas fa-coins"></i> Consumos</button>
+            <button class="tab-button" onclick="openTab(event, 'config')"><i class="fas fa-cogs"></i> Configurações</button>
         </nav>
 
         <div id="dashboard" class="tab-content active">
-            <h2>Dashboard</h2>
-            <div class="stats-grid">
-                <div class="stat-card primary">
-                    <i class="fas fa-dollar-sign"></i>
-                    <p>Total Arrecadado</p>
-                    <span id="totalArrecadado">R$ 0,00</span>
-                </div>
-                <div class="stat-card success">
-                    <i class="fas fa-hand-holding-usd"></i>
-                    <p>Total Consignado</p>
-                    <span id="totalConsignado">R$ 0,00</span>
-                </div>
-                <div class="stat-card danger">
-                    <i class="fas fa-money-bill-wave"></i>
-                    <p>Total Comissão</p>
-                    <span id="totalComissao">R$ 0,00</span>
-                </div>
-                <div class="stat-card info">
-                    <i class="fas fa-tags"></i>
-                    <p>Itens Vendidos</p>
-                    <span id="itensVendidos">0</span>
-                </div>
-            </div>
-
-            <div class="chart-container">
-                <h3>Vendas por Mês</h3>
-                <canvas id="vendasChart"></canvas>
+            <h2>📊 Dashboard de Visão Geral</h2>
+            <div class="dashboard-controls">
+                <select id="filtroMesDashboard" onchange="renderizarDashboard()"></select>
+                <select id="filtroBazarDashboard" onchange="renderizarDashboard()"></select>
+                <select id="filtroConsignatarioDashboard" onchange="renderizarDashboard()"></select>
             </div>
             
-            <div class="chart-container">
-                <h3>Vendas por Consignatário (Top 5)</h3>
-                <canvas id="consignatariosChart"></canvas>
+            <div class="dashboard-grid">
+                <div class="card stat-card primary">
+                    <h3>Total de Vendas</h3>
+                    <p id="totalVendasDashboard">R$ 0,00</p>
+                </div>
+                <div class="card stat-card success">
+                    <h3>Créditos Gerados</h3>
+                    <p id="creditosGeradosDashboard">R$ 0,00</p>
+                </div>
+                <div class="card stat-card info">
+                    <h3>Créditos Utilizados</h3>
+                    <p id="creditosUtilizadosDashboard">R$ 0,00</p>
+                </div>
+                <div class="card stat-card danger">
+                    <h3>Itens em Estoque</h3>
+                    <p id="itensEmEstoqueDashboard">0</p>
+                </div>
             </div>
 
-        </div>
-        
-        <div id="vendas" class="tab-content">
-            <h2>Registro de Vendas</h2>
-            <div class="form-grid">
-                <div class="input-group">
-                    <label for="vendaItem">Código do Item:</label>
-                    <input type="text" id="vendaItem" placeholder="Insira o código do item" required>
-                    <span id="item-info" class="text-muted"></span>
+            <div class="charts-container">
+                <div class="card chart-card">
+                    <h3>Vendas e Créditos (Últimos 6 Meses)</h3>
+                    <canvas id="vendasCreditosChart"></canvas>
                 </div>
-                <div class="input-group">
-                    <label for="vendaComprador">Comprador:</label>
-                    <select id="vendaComprador" required>
-                        </select>
-                </div>
-                <div class="input-group">
-                    <label for="vendaBazar">Bazar:</label>
-                    <select id="vendaBazar" required>
-                        </select>
-                </div>
-                <div class="input-group">
-                    <label for="vendaPreco">Preço de Venda (R$):</label>
-                    <input type="number" id="vendaPreco" placeholder="0.00" step="0.01" min="0" required>
-                </div>
-                <div class="input-group">
-                    <label for="vendaTipoPagamento">Pagamento:</label>
-                    <select id="vendaTipoPagamento" required>
-                        <option value="Dinheiro">Dinheiro</option>
-                        <option value="Cartão">Cartão</option>
-                        <option value="Pix">Pix</option>
-                        <option value="Crédito Interno">Crédito Interno</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="vendaData">Data da Venda:</label>
-                    <input type="date" id="vendaData" value="" required>
+                <div class="card chart-card">
+                    <h3>Top 5 Consignatários por Vendas</h3>
+                    <canvas id="topConsignatariosChart"></canvas>
                 </div>
             </div>
-            <button onclick="registrarVenda()" class="btn btn-primary btn-full"><i class="fas fa-plus"></i> Registrar Venda</button>
 
-            <h3>Vendas Registradas</h3>
-            <div class="table-container">
-                <table id="vendasTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Data</th>
-                            <th>Item (Código)</th>
-                            <th>Consignatário</th>
-                            <th>Comprador</th>
-                            <th>Valor Venda</th>
-                            <th>Comissão</th>
-                            <th>Repasse</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="itens" class="tab-content">
-            <h2>Cadastro de Itens</h2>
-            <div class="form-grid">
-                <div class="input-group">
-                    <label for="itemCodigo">Código:</label>
-                    <input type="text" id="itemCodigo" placeholder="Código Único (ex: C001-01)" required>
+            <div class="card table-card">
+                <h3>Últimas Vendas</h3>
+                <div class="table-responsive">
+                    <table id="ultimasVendasTable">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Comprador</th>
+                                <th>Bazar</th>
+                                <th>Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
                 </div>
-                <div class="input-group">
-                    <label for="itemDescricao">Descrição:</label>
-                    <input type="text" id="itemDescricao" placeholder="Vestido longo, Brinquedo, etc." required>
-                </div>
-                <div class="input-group">
-                    <label for="itemPrecoSugerido">Preço Sugerido (R$):</label>
-                    <input type="number" id="itemPrecoSugerido" placeholder="0.00" step="0.01" min="0" required>
-                </div>
-                <div class="input-group">
-                    <label for="itemConsignatario">Consignatário:</label>
-                    <select id="itemConsignatario" required>
-                        </select>
-                </div>
-                <div class="input-group">
-                    <label for="itemBazar">Bazar de Entrada:</label>
-                    <select id="itemBazar" required>
-                        </select>
-                </div>
-                <div class="input-group">
-                    <label for="itemStatus">Status:</label>
-                    <select id="itemStatus" required>
-                        <option value="Disponível">Disponível</option>
-                        <option value="Vendido">Vendido</option>
-                        <option value="Baixado">Baixado (Devolvido/Descartado)</option>
-                    </select>
-                </div>
-            </div>
-            <button onclick="adicionarItem()" class="btn btn-primary btn-full"><i class="fas fa-plus"></i> Cadastrar Item (Ctrl+S)</button>
-
-            <h3>Itens Cadastrados</h3>
-            <div class="filter-controls">
-                <input type="text" id="filtroItens" placeholder="Filtrar por Código, Descrição ou Consignatário">
-                <select id="filtroStatus">
-                    <option value="">Todos os Status</option>
-                    <option value="Disponível">Disponível</option>
-                    <option value="Vendido">Vendido</option>
-                    <option value="Baixado">Baixado</option>
-                </select>
-            </div>
-            <div class="table-container">
-                <table id="itensTable">
-                    <thead>
-                        <tr>
-                            <th>Código</th>
-                            <th>Descrição</th>
-                            <th>Preço Sugerido</th>
-                            <th>Consignatário</th>
-                            <th>Bazar</th>
-                            <th>Status</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="consignatarios" class="tab-content">
-            <h2>Cadastro de Consignatários</h2>
-            <div class="form-grid">
-                <div class="input-group">
-                    <label for="consignatarioNome">Nome:</label>
-                    <input type="text" id="consignatarioNome" placeholder="Nome Completo" required>
-                </div>
-                <div class="input-group">
-                    <label for="consignatarioEmail">Email:</label>
-                    <input type="email" id="consignatarioEmail" placeholder="email@exemplo.com">
-                </div>
-                <div class="input-group">
-                    <label for="consignatarioTelefone">Telefone:</label>
-                    <input type="text" id="consignatarioTelefone" placeholder="(XX) XXXXX-XXXX">
-                </div>
-            </div>
-            <button onclick="adicionarConsignatario()" class="btn btn-primary btn-full"><i class="fas fa-user-tag"></i> Cadastrar Consignatário (Ctrl+S)</button>
-
-            <h3>Consignatários Cadastrados</h3>
-            <div class="table-container">
-                <table id="consignatariosTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nome</th>
-                            <th>Email</th>
-                            <th>Telefone</th>
-                            <th>Crédito Disponível (R$)</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="compradores" class="tab-content">
-            <h2>Cadastro de Compradores</h2>
-            <div class="form-grid">
-                <div class="input-group">
-                    <label for="compradorNome">Nome:</label>
-                    <input type="text" id="compradorNome" placeholder="Nome Completo" required>
-                </div>
-                <div class="input-group">
-                    <label for="compradorEmail">Email:</label>
-                    <input type="email" id="compradorEmail" placeholder="email@exemplo.com">
-                </div>
-                <div class="input-group">
-                    <label for="compradorTelefone">Telefone:</label>
-                    <input type="text" id="compradorTelefone" placeholder="(XX) XXXXX-XXXX">
-                </div>
-            </div>
-            <button onclick="adicionarComprador()" class="btn btn-primary btn-full"><i class="fas fa-shopping-cart"></i> Cadastrar Comprador (Ctrl+S)</button>
-
-            <h3>Compradores Cadastrados</h3>
-            <div class="table-container">
-                <table id="compradoresTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nome</th>
-                            <th>Email</th>
-                            <th>Telefone</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        </tbody>
-                </table>
             </div>
         </div>
 
         <div id="bazares" class="tab-content">
-            <h2>Gestão de Bazares</h2>
-            <div class="form-grid">
-                <div class="input-group">
-                    <label for="bazarNome">Nome do Bazar:</label>
-                    <input type="text" id="bazarNome" placeholder="Bazar Primavera 2025" required>
+            <h2>🛍️ Gestão de Bazares</h2>
+            <div class="card">
+                <h3>Criar Novo Bazar</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nomeBazar">Nome do Bazar</label>
+                        <input type="text" id="nomeBazar" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dataInicioBazar">Data de Início</label>
+                        <input type="date" id="dataInicioBazar" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dataFimBazar">Data de Fim (Opcional)</label>
+                        <input type="date" id="dataFimBazar">
+                    </div>
                 </div>
-                <div class="input-group">
-                    <label for="bazarDataInicio">Data de Início:</label>
-                    <input type="date" id="bazarDataInicio" required>
-                </div>
-                <div class="input-group">
-                    <label for="bazarDataFim">Data de Fim:</label>
-                    <input type="date" id="bazarDataFim">
-                </div>
-                <div class="input-group">
-                    <label for="bazarStatus">Status:</label>
-                    <select id="bazarStatus">
-                        <option value="Ativo">Ativo</option>
-                        <option value="Finalizado">Finalizado</option>
-                        <option value="Planejado">Planejado</option>
-                    </select>
+                <div class="action-buttons">
+                    <button onclick="criarBazar()" class="btn btn-primary"><i class="fas fa-plus"></i> Criar Bazar</button>
+                    <button onclick="exportarBazares()" class="btn btn-export"><i class="fas fa-file-export"></i> Exportar</button>
+                    <button onclick="iniciarImportacao('bazares')" class="btn btn-import"><i class="fas fa-file-import"></i> Importar</button>
                 </div>
             </div>
-            <button onclick="criarBazar()" class="btn btn-primary btn-full"><i class="fas fa-calendar-plus"></i> Criar Bazar (Ctrl+S)</button>
-
-            <h3>Bazares Registrados</h3>
-            <div class="table-container">
-                <table id="bazaresTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nome</th>
-                            <th>Início</th>
-                            <th>Fim</th>
-                            <th>Status</th>
-                            <th>Total Vendas (R$)</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        </tbody>
-                </table>
+            
+            <div class="card">
+                <h3>Lista de Bazares</h3>
+                <div class="table-responsive">
+                    <table id="bazaresTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Início</th>
+                                <th>Fim</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div id="itens" class="tab-content">
+            <h2>🏷️ Gestão de Itens (Estoque)</h2>
+            <div class="card">
+                <h3>Adicionar Novo Item</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="descricaoItem">Descrição</label>
+                        <input type="text" id="descricaoItem" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="consignatarioItemId">Consignatário</label>
+                        <select id="consignatarioItemId" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="valorItem">Valor (R$)</label>
+                        <input type="number" id="valorItem" min="0.01" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantidadeItem">Quantidade</label>
+                        <input type="number" id="quantidadeItem" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bazarItemId">Bazar</label>
+                        <select id="bazarItemId" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="statusItem">Status</label>
+                        <select id="statusItem" required>
+                            <option value="Disponível">Disponível</option>
+                            <option value="Vendido">Vendido</option>
+                            <option value="Reservado">Reservado</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button onclick="adicionarItem()" class="btn btn-primary"><i class="fas fa-plus"></i> Adicionar Item</button>
+                    <button onclick="exportarItens()" class="btn btn-export"><i class="fas fa-file-export"></i> Exportar</button>
+                    <button onclick="iniciarImportacao('itens')" class="btn btn-import"><i class="fas fa-file-import"></i> Importar</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Lista de Itens</h3>
+                <div class="filtros-container">
+                    <input type="text" id="filtroDescricaoItem" onkeyup="renderizarItens()" placeholder="Filtrar por Descrição">
+                    <select id="filtroConsignatarioItem" onchange="renderizarItens()"></select>
+                    <select id="filtroBazarItem" onchange="renderizarItens()"></select>
+                    <select id="filtroStatusItem" onchange="renderizarItens()">
+                        <option value="">Todos os Status</option>
+                        <option value="Disponível">Disponível</option>
+                        <option value="Vendido">Vendido</option>
+                        <option value="Reservado">Reservado</option>
+                    </select>
+                    <button onclick="limparFiltrosItens()" class="btn btn-secondary"><i class="fas fa-broom"></i> Limpar Filtros</button>
+                </div>
+                <div class="table-responsive">
+                    <table id="itensTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Descrição</th>
+                                <th>Consignatário</th>
+                                <th>Valor</th>
+                                <th>Qtd</th>
+                                <th>Bazar</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <div id="relatorios" class="tab-content">
-            <h2>Relatórios de Consignatários</h2>
-            <div class="form-grid">
-                <div class="input-group">
-                    <label for="relatorioConsignatario">Selecionar Consignatário:</label>
-                    <select id="relatorioConsignatario" onchange="gerarRelatorioConsignatario()">
-                        </select>
+        <div id="consignatarios" class="tab-content">
+            <h2>🤝 Gestão de Consignatários</h2>
+            <div class="card">
+                <h3>Cadastrar Novo Consignatário</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nomeConsignatario">Nome</label>
+                        <input type="text" id="nomeConsignatario" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="telefoneConsignatario">Telefone</label>
+                        <input type="tel" id="telefoneConsignatario">
+                    </div>
+                    <div class="form-group">
+                        <label for="emailConsignatario">Email</label>
+                        <input type="email" id="emailConsignatario">
+                    </div>
                 </div>
-                <div class="input-group">
-                    <label for="relatorioBazar">Filtrar por Bazar:</label>
-                    <select id="relatorioBazar" onchange="gerarRelatorioConsignatario()">
-                        <option value="">Todos os Bazares</option>
-                        </select>
+                <div class="action-buttons">
+                    <button onclick="adicionarConsignatario()" class="btn btn-primary"><i class="fas fa-user-plus"></i> Cadastrar</button>
+                    <button onclick="exportarConsignatarios()" class="btn btn-export"><i class="fas fa-file-export"></i> Exportar</button>
+                    <button onclick="iniciarImportacao('consignatarios')" class="btn btn-import"><i class="fas fa-file-import"></i> Importar</button>
                 </div>
             </div>
-
-            <div id="relatorioOutput" class="relatorio-output">
-                </div>
             
-            <button id="downloadRelatorio" class="btn btn-success" style="display: none;" onclick="exportarRelatorioPDF()"><i class="fas fa-file-pdf"></i> Baixar PDF</button>
-
-            <h3>Histórico de Créditos/Pagamentos</h3>
-            <div class="table-container">
-                <table id="creditoHistoricoTable">
-                    <thead>
-                        <tr>
-                            <th>Data</th>
-                            <th>Tipo</th>
-                            <th>Descrição</th>
-                            <th>Valor (R$)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        </tbody>
-                </table>
-            </div>
-
-            <h3>Ajuste de Crédito</h3>
-            <div class="form-grid small-grid">
-                <div class="input-group">
-                    <label for="ajusteTipo">Tipo de Ajuste:</label>
-                    <select id="ajusteTipo">
-                        <option value="Adicionar">Adicionar (Pagamento)</option>
-                        <option value="Subtrair">Subtrair (Gasto/Retirada)</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="ajusteValor">Valor (R$):</label>
-                    <input type="number" id="ajusteValor" placeholder="0.00" step="0.01" min="0">
-                </div>
-                <div class="input-group">
-                    <label for="ajusteDescricao">Descrição:</label>
-                    <input type="text" id="ajusteDescricao" placeholder="Pagamento em PIX, Retirada em espécie, etc.">
+            <div class="card">
+                <h3>Lista de Consignatários</h3>
+                <div class="table-responsive">
+                    <table id="consignatariosTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Telefone</th>
+                                <th>Crédito</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
                 </div>
             </div>
-            <button onclick="ajustarCredito()" class="btn btn-warning"><i class="fas fa-edit"></i> Realizar Ajuste</button>
+        </div>
+
+        <div id="compradores" class="tab-content">
+            <h2>👤 Gestão de Compradores</h2>
+            <div class="card">
+                <h3>Cadastrar Novo Comprador</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nomeComprador">Nome</label>
+                        <input type="text" id="nomeComprador" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="telefoneComprador">Telefone</label>
+                        <input type="tel" id="telefoneComprador">
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button onclick="adicionarComprador()" class="btn btn-primary"><i class="fas fa-user-plus"></i> Cadastrar</button>
+                    <button onclick="exportarCompradores()" class="btn btn-export"><i class="fas fa-file-export"></i> Exportar</button>
+                    <button onclick="iniciarImportacao('compradores')" class="btn btn-import"><i class="fas fa-file-import"></i> Importar</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Lista de Compradores</h3>
+                <div class="table-responsive">
+                    <table id="compradoresTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Telefone</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="vendas" class="tab-content">
+            <h2>🛒 Registro de Vendas</h2>
+            <div class="card">
+                <h3>Registrar Nova Venda</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="compradorVendaId">Comprador</label>
+                        <select id="compradorVendaId" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="bazarVendaId">Bazar</label>
+                        <select id="bazarVendaId" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemVendidoId">Item Vendido</label>
+                        <select id="itemVendidoId" onchange="preencherValorVenda()" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="valorVenda">Valor da Venda (R$)</label>
+                        <input type="number" id="valorVenda" min="0.01" step="0.01" required readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="dataVenda">Data da Venda</label>
+                        <input type="date" id="dataVenda" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="formaPagamentoVenda">Forma de Pagamento</label>
+                        <select id="formaPagamentoVenda" required>
+                            <option value="Dinheiro">Dinheiro</option>
+                            <option value="Cartão">Cartão</option>
+                            <option value="Pix">Pix</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button onclick="registrarVenda()" class="btn btn-primary"><i class="fas fa-cash-register"></i> Registrar Venda</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Histórico de Vendas</h3>
+                <div class="filtros-container">
+                    <select id="filtroBazarVenda" onchange="renderizarVendas()"></select>
+                    <select id="filtroConsignatarioVenda" onchange="renderizarVendas()"></select>
+                    <select id="filtroCompradorVenda" onchange="renderizarVendas()"></select>
+                    <input type="date" id="filtroDataInicialVenda" onchange="renderizarVendas()">
+                    <input type="date" id="filtroDataFinalVenda" onchange="renderizarVendas()">
+                    <button onclick="limparFiltrosVendas()" class="btn btn-secondary"><i class="fas fa-broom"></i> Limpar Filtros</button>
+                    <button onclick="gerarRelatorioVendas()" class="btn btn-export"><i class="fas fa-file-pdf"></i> Gerar Relatório</button>
+                </div>
+                <div class="table-responsive">
+                    <table id="vendasTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Data</th>
+                                <th>Item</th>
+                                <th>Consignatário</th>
+                                <th>Comprador</th>
+                                <th>Valor</th>
+                                <th>Crédito Gerado</th>
+                                <th>Bazar</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div id="consumos" class="tab-content">
+            <h2>💰 Uso de Créditos (Consumos)</h2>
+            <div class="card">
+                <h3>Registrar Uso de Crédito</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="consignatarioConsumoId">Consignatário (Quem usou o crédito)</label>
+                        <select id="consignatarioConsumoId" required onchange="atualizarSaldoConsignatario()"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="saldoConsignatario">Saldo de Crédito Disponível (R$)</label>
+                        <input type="text" id="saldoConsignatario" readonly value="R$ 0,00">
+                    </div>
+                    <div class="form-group">
+                        <label for="valorConsumo">Valor do Consumo (R$)</label>
+                        <input type="number" id="valorConsumo" min="0.01" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dataConsumo">Data do Consumo</label>
+                        <input type="date" id="dataConsumo" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="descricaoConsumo">Descrição/Motivo</label>
+                        <input type="text" id="descricaoConsumo" required>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button onclick="registrarConsumo()" class="btn btn-primary"><i class="fas fa-minus-circle"></i> Registrar Consumo</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Histórico de Consumos (Uso de Crédito)</h3>
+                <div class="filtros-container">
+                    <select id="filtroConsignatarioConsumo" onchange="renderizarConsumos()"></select>
+                    <input type="date" id="filtroDataInicialConsumo" onchange="renderizarConsumos()">
+                    <input type="date" id="filtroDataFinalConsumo" onchange="renderizarConsumos()">
+                    <button onclick="limparFiltrosConsumos()" class="btn btn-secondary"><i class="fas fa-broom"></i> Limpar Filtros</button>
+                </div>
+                <div class="table-responsive">
+                    <table id="consumosTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Data</th>
+                                <th>Consignatário</th>
+                                <th>Descrição</th>
+                                <th>Valor</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
         <div id="config" class="tab-content">
-            <h2>Configurações do Sistema</h2>
-            <div class="config-section">
-                <h3>Taxas e Comissões</h3>
-                <div class="form-grid small-grid">
-                    <div class="input-group">
-                        <label for="comissaoPadrao">Comissão Padrão do Bazar (%):</label>
-                        <input type="number" id="comissaoPadrao" placeholder="30" min="0" max="100">
+            <h2>⚙️ Configurações do Sistema</h2>
+            <div class="card">
+                <h3>Preferências de Tema</h3>
+                <div class="form-group">
+                    <label for="temaSistema">Tema</label>
+                    <select id="temaSistema" onchange="mudarTemaSistema()">
+                        <option value="light">Claro</option>
+                        <option value="dark">Escuro</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Backup de Dados</h3>
+                <div class="action-buttons">
+                    <button onclick="exportarDados()" class="btn btn-export"><i class="fas fa-download"></i> Fazer Backup (JSON)</button>
+                    <button onclick="iniciarImportacaoGeral()" class="btn btn-import"><i class="fas fa-upload"></i> Restaurar Backup (JSON)</button>
+                    <p class="small-info">Isso exporta/restaura todos os dados (Bazares, Itens, Clientes, Vendas, Consumos).</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Parâmetros Financeiros e Operacionais</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="percentualConsignatario">Percentual Consignatário (%)</label>
+                        <input type="number" id="percentualConsignatario" min="0" max="100" value="80" required>
                     </div>
-                    <div class="input-group">
-                        <label for="descontoMaximo">Desconto Máximo Permitido (%):</label>
-                        <input type="number" id="descontoMaximo" placeholder="10" min="0" max="100">
+                    <div class="form-group">
+                        <label for="percentualLoja">Percentual Loja (%)</label>
+                        <input type="number" id="percentualLoja" min="0" max="100" value="20" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="validadeCredito">Validade do Crédito (Meses)</label>
+                        <input type="number" id="validadeCredito" min="1" value="6" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="alertaEstoque">Alerta de Estoque Baixo (Itens)</label>
+                        <input type="number" id="alertaEstoque" min="1" value="5" required>
                     </div>
                 </div>
-                <button onclick="salvarConfiguracoes()" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Configurações</button>
+                <div class="action-buttons">
+                    <button onclick="salvarConfiguracoes()" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Salvar Configurações
+                    </button>
+                </div>
             </div>
+
             
-            <div class="config-section">
-                <h3>Gerenciamento de Dados</h3>
-                <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importarDados(event)">
-                <button onclick="document.getElementById('importFile').click()" class="btn btn-info"><i class="fas fa-upload"></i> Importar Dados (.json)</button>
-                <button onclick="exportarDados()" class="btn btn-info"><i class="fas fa-download"></i> Exportar Dados (.json)</button>
-                <button onclick="limparTodosDados()" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Limpar TODOS os Dados</button>
-                <p class="text-muted mt-2">Use a opção de exportar para fazer um backup antes de limpar.</p>
-            </div>
         </div>
+    </main>
 
-        <footer class="footer">
-            <p>&copy; 2025 BazarPlus - Gestão de Bazares e Créditos. Desenvolvido por [Seu Nome/Empresa]</p>
-        </footer>
+    <div id="notification-area"></div>
+    <input type="file" id="importFile" accept="application/json" style="display: none;" onchange="processarImportacao(event)">
 
-    </div>
-    <script src="script.js"></script>
+    <script src="script.js"></script> 
 </body>
 </html>
