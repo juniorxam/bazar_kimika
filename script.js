@@ -4,7 +4,7 @@
         let bazares = [];
         let itens = [];
         let clientes = []; // ARRAY DE CONSIGNATÁRIOS (DONOS DOS ITENS)
-        let compradores = []; // NOVO: ARRAY DE CLIENTES COMPRADORES
+        let compradores = []; // ARRAY DE CLIENTES COMPRADORES
         let vendas = [];
         let consumos = [];
         let configuracoes = {
@@ -112,11 +112,11 @@
             vendas = [];
             consumos = [];
             configuracoes = { percentualConsignatario: 80, percentualLoja: 20, validadeCredito: 6, alertaEstoque: 5, tema: 'light' };
-            checkInitializers();
-            if (showNotif) mostrarNotificacao('Todos os dados foram resetados.', 'sucesso');
+            // Recarrega a página para resetar o estado.
+            location.reload(); 
         }
 
-        // --- Funções de Importação e Exportação (Simuladas) ---
+        // --- Funções de Importação e Exportação ---
         function exportarDados() {
             const data = {
                 bazares,
@@ -162,7 +162,8 @@
                         configuracoes = { ...configuracoes, ...importedData.configuracoes };
                         
                         salvarDados();
-                        checkInitializers();
+                        // Recarrega a página para aplicar os dados
+                        location.reload(); 
                         mostrarNotificacao('Dados restaurados com sucesso!', 'sucesso');
                     }
                 } catch (error) {
@@ -172,6 +173,122 @@
             };
             reader.readAsText(file);
         }
+        
+        // ========================================
+        // FUNÇÃO DE DADOS DE EXEMPLO (NOVA)
+        // ========================================
+        function carregarDadosDeExemplo() {
+            if (!confirm('Esta ação limpará todos os dados existentes e carregará 20 exemplos de vendas e estoque. Continuar?')) {
+                return;
+            }
+            limparTudo(false); // Limpa sem perguntar novamente
+            
+            // 1. DADOS DE CONSIGNATÁRIOS
+            const nomesConsignatarios = ['Ana Silva', 'Bruno Lima', 'Carla Mendes', 'David Costa', 'Elaine Fernandes'];
+            clientes = nomesConsignatarios.map((nome, index) => ({
+                id: index + 1,
+                nome,
+                telefone: `(99) 99999-${1000 + index}`,
+                email: `${nome.toLowerCase().replace(' ', '.')}@email.com`,
+                creditos: 0.00
+            }));
+
+            // 2. DADOS DE COMPRADORES
+            const nomesCompradores = ['Felipe Gomes', 'Gabriela Alves', 'Henrique Souza', 'Isabela Rocha', 'João Pereira'];
+            compradores = nomesCompradores.map((nome, index) => ({
+                id: index + 1,
+                nome,
+                telefone: `(99) 88888-${1000 + index}`,
+                totalCompras: 0.00
+            }));
+            
+            // 3. DADOS DE BAZARES
+            bazares = [
+                { id: 1, nome: 'Bazar Verão 2025', dataInicio: '2025-01-10', dataFim: '2025-01-20' },
+                { id: 2, nome: 'Bazar Outono 2025', dataInicio: '2025-04-05', dataFim: null },
+                { id: 3, nome: 'Bazar Inverno 2025', dataInicio: '2025-07-01', dataFim: '2025-07-15' },
+            ];
+
+            // 4. ITENS INICIAIS (ALGUNS VENDIDOS, OUTROS DISPONÍVEIS)
+            const descricoesItens = [
+                'Vestido Floral Longo', 'Calça Jeans Skinny', 'Blusa de Seda', 'Jaqueta de Couro', 'Bolsa Tiracolo',
+                'Sapato Social Masculino', 'Tênis Esportivo', 'Óculos de Sol', 'Cinto de Couro', 'Brinco de Prata'
+            ];
+            
+            itens = descricoesItens.map((desc, index) => ({
+                id: index + 1,
+                descricao: desc,
+                consignatarioId: (index % clientes.length) + 1,
+                valor: parseFloat((Math.random() * 200 + 50).toFixed(2)),
+                quantidade: 0, // Inicia em 0, será ajustado pelas vendas
+                bazarId: (index % bazares.length) + 1,
+                status: 'Vendido' // status inicial é irrelevante, pois criaremos as vendas
+            }));
+
+            // 5. REGISTRO DE 20 VENDAS ALEATÓRIAS
+            for (let i = 0; i < 20; i++) {
+                const itemId = (i % itens.length) + 1;
+                const itemBase = itens[itemId - 1];
+                const valorVenda = parseFloat((itemBase.valor * (Math.random() * 0.2 + 0.9)).toFixed(2)); // Varia 10%
+
+                const consignatario = clientes.find(c => c.id === itemBase.consignatarioId);
+                const comprador = compradores[(i % compradores.length)];
+                
+                const percentualConsignatario = configuracoes.percentualConsignatario / 100;
+                const creditoGerado = valorVenda * percentualConsignatario;
+                const comissaoLoja = valorVenda - creditoGerado;
+                
+                // Atualiza o estoque
+                itemBase.quantidade += 1;
+                itemBase.status = 'Vendido'; // Venda registrada
+                
+                // Atualiza o crédito do consignatário
+                consignatario.creditos = (consignatario.creditos || 0) + creditoGerado;
+
+                // Atualiza o total de compras do comprador
+                comprador.totalCompras = (comprador.totalCompras || 0) + valorVenda;
+
+                // Define a data de venda aleatória nos últimos 60 dias
+                const dateOffset = Math.floor(Math.random() * 60); // 0 to 59 days ago
+                const date = new Date();
+                date.setDate(date.getDate() - dateOffset);
+                const dataVenda = date.toISOString().split('T')[0];
+
+                vendas.push({
+                    id: i + 1,
+                    itemId: itemId,
+                    compradorId: comprador.id,
+                    bazarVendaId: itemBase.bazarId,
+                    valorVenda,
+                    creditoGerado,
+                    comissaoLoja,
+                    dataVenda,
+                    formaPagamento: ['PIX', 'Cartao', 'Dinheiro'][(i % 3)]
+                });
+            }
+            
+            // 6. REGISTRO DE CONSUMOS (PARA TESTAR DEDUÇÃO DE CRÉDITO)
+            consumos.push({
+                id: 1,
+                consignatarioId: 1, // Ana Silva
+                valor: 50.00,
+                data: obterDataHojeISO(),
+                descricao: 'Retirada de crédito em dinheiro'
+            });
+            clientes.find(c => c.id === 1).creditos -= 50.00;
+
+            // 7. ITENS DISPONÍVEIS ADICIONAIS
+            itens.push(
+                { id: 11, descricao: 'Camiseta Básica P', consignatarioId: 2, valor: 45.00, quantidade: 3, bazarId: 2, status: 'Disponível' },
+                { id: 12, descricao: 'Porta Retratos Grande', consignatarioId: 5, valor: 90.00, quantidade: 1, bazarId: 2, status: 'Disponível' }
+            );
+
+
+            salvarDados();
+            location.reload(); // Recarrega para aplicar os dados e atualizar o Dashboard
+            mostrarNotificacao('20 Vendas, 5 Consignatários e 12 Itens de exemplo carregados!', 'sucesso');
+        }
+
 
         // ========================================
         // GESTÃO DE TABS E INICIALIZAÇÃO
@@ -206,6 +323,10 @@
             if (tabName === 'consumos') {
                 carregarOpcoesConsignatariosConsumo();
                 renderizarConsumos();
+            }
+            if (tabName === 'relatorios') {
+                // Prepara a aba de relatórios
+                document.getElementById('relatorioPreview').innerHTML = '<p style="color: var(--text-muted); text-align: center;">Selecione o tipo de relatório e clique em "Gerar Relatório".</p>';
             }
         }
         
@@ -251,7 +372,8 @@
             document.getElementById('percentualLoja').value = configuracoes.percentualLoja;
             document.getElementById('validadeCredito').value = configuracoes.validadeCredito;
             document.getElementById('alertaEstoque').value = configuracoes.alertaEstoque;
-            document.getElementById('temaSistema').value = configuracoes.tema;
+            const temaSistema = document.getElementById('temaSistema');
+            if (temaSistema) temaSistema.value = configuracoes.tema;
 
             // Aplica tema
             document.documentElement.setAttribute('data-theme', configuracoes.tema);
@@ -318,10 +440,6 @@
             bazares.sort((a, b) => new Date(b.dataInicio) - new Date(a.dataInicio)); 
 
             bazares.forEach(bazar => {
-                const vendasBazar = vendas.filter(v => v.bazarVendaId === bazar.id);
-                const totalVendasBazar = vendasBazar.reduce((acc, v) => acc + v.valorVenda, 0);
-                const itensBazar = itens.filter(i => i.bazarId === bazar.id);
-
                 const row = tbody.insertRow();
                 row.innerHTML = `
                     <td>${bazar.id}</td>
@@ -337,6 +455,24 @@
                 tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Nenhum bazar cadastrado.</td></tr>`;
             }
         }
+        
+        function excluirBazar(bazarId) {
+            const index = bazares.findIndex(b => b.id === bazarId);
+            if (index > -1) {
+                 if (itens.some(i => i.bazarId === bazarId)) {
+                    mostrarNotificacao('Não é possível excluir o bazar. Existem itens vinculados a ele.', 'erro');
+                    return;
+                }
+                if (confirm('Tem certeza que deseja excluir este bazar?')) {
+                    bazares.splice(index, 1);
+                    salvarDados();
+                    mostrarNotificacao('Bazar excluído com sucesso!', 'sucesso');
+                    atualizarListaBazares();
+                    carregarOpcoesBazares(true);
+                }
+            }
+        }
+
 
         // Função auxiliar para carregar opções de bazar em selects
         function carregarOpcoesBazares(incluirFiltros = false) {
@@ -421,6 +557,28 @@
                 tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Nenhum consignatário cadastrado.</td></tr>`;
             }
         }
+        
+        function excluirConsignatario(consignatarioId) {
+            const index = clientes.findIndex(c => c.id === consignatarioId);
+            if (index > -1) {
+                 if (itens.some(i => i.consignatarioId === consignatarioId)) {
+                    mostrarNotificacao('Não é possível excluir. Existem itens vinculados a este consignatário.', 'erro');
+                    return;
+                }
+                if (clientes[index].creditos !== 0) {
+                    mostrarNotificacao('Não é possível excluir o consignatário. O saldo de crédito deve ser zero.', 'erro');
+                    return;
+                }
+                if (confirm('Tem certeza que deseja excluir este consignatário?')) {
+                    clientes.splice(index, 1);
+                    salvarDados();
+                    mostrarNotificacao('Consignatário excluído com sucesso!', 'sucesso');
+                    atualizarListaConsignatarios();
+                    carregarOpcoesConsignatarios(true);
+                }
+            }
+        }
+
 
         // Função auxiliar para carregar opções de consignatário em selects
         function carregarOpcoesConsignatarios(incluirFiltros = false) {
@@ -510,6 +668,24 @@
                 tbody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Nenhum comprador cadastrado.</td></tr>`;
             }
         }
+        
+        function excluirComprador(compradorId) {
+            const index = compradores.findIndex(c => c.id === compradorId);
+            if (index > -1) {
+                 if (vendas.some(v => v.compradorId === compradorId)) {
+                    mostrarNotificacao('Não é possível excluir. Existem vendas vinculadas a este comprador.', 'erro');
+                    return;
+                }
+                if (confirm('Tem certeza que deseja excluir este comprador?')) {
+                    compradores.splice(index, 1);
+                    salvarDados();
+                    mostrarNotificacao('Comprador excluído com sucesso!', 'sucesso');
+                    atualizarListaCompradores();
+                    carregarOpcoesCompradoresVenda();
+                }
+            }
+        }
+
         
         // Função auxiliar para carregar opções de comprador em selects
         function carregarOpcoesCompradoresVenda() {
@@ -859,12 +1035,6 @@
             renderizarVendas();
         }
 
-        // Função Gerar Relatório (simulada)
-        function gerarRelatorioVendas() {
-            mostrarNotificacao('Função de gerar PDF/Relatório ativada. (Implementação com jspdf precisa ser completa).', 'info');
-            // Aqui você chamaria a lógica do jsPDF para criar o relatório filtrado
-        }
-
 
         // ========================================
         // GESTÃO DE CONSUMOS (Uso de Crédito)
@@ -1014,8 +1184,6 @@
         // ========================================
         // DASHBOARD
         // ========================================
-        let vendasCreditosChart = null;
-        let topConsignatariosChart = null;
         
         function renderizarDashboard() {
             // Carrega opções de filtro para o Dashboard
@@ -1025,7 +1193,7 @@
             // Coleta filtros
             const filtroBazarId = document.getElementById('filtroBazarDashboard').value;
             const filtroConsignatarioId = document.getElementById('filtroConsignatarioDashboard').value;
-            const filtroMes = document.getElementById('filtroMesDashboard').value; // Implementação simplificada
+            const filtroMes = document.getElementById('filtroMesDashboard').value; 
 
             let vendasFiltradas = vendas;
 
@@ -1038,7 +1206,7 @@
                     return item && item.consignatarioId === parseInt(filtroConsignatarioId);
                 });
             }
-            // Filtro por Mês (simplificado para exemplo, geralmente precisa do ano)
+            // Filtro por Mês 
             if (filtroMes) {
                 vendasFiltradas = vendasFiltradas.filter(v => {
                     return new Date(v.dataVenda).getMonth() + 1 === parseInt(filtroMes);
@@ -1049,20 +1217,29 @@
             // CÁLCULOS
             const totalVendas = vendasFiltradas.reduce((acc, v) => acc + v.valorVenda, 0);
             const creditosGerados = vendasFiltradas.reduce((acc, v) => acc + v.creditoGerado, 0);
+            const comissaoTotalLoja = vendasFiltradas.reduce((acc, v) => acc + v.comissaoLoja, 0);
+            
+            // Créditos Ativos: Soma de todos os saldos dos consignatários
+            const creditosAtivos = clientes.reduce((acc, c) => acc + (c.creditos > 0 ? c.creditos : 0), 0);
+            
+            // Créditos Utilizados (Consumos): Usamos o array global, pois o filtro de vendas não se aplica a consumos
             const creditosUtilizados = consumos.reduce((acc, c) => acc + c.valor, 0);
-            const itensEmEstoque = itens.filter(i => i.status === 'Disponível' && i.quantidade > 0).length;
-            const ultimasVendas = vendasFiltradas.sort((a, b) => new Date(b.dataVenda) - new Date(a.dataVenda)).slice(0, 5);
-
+            
+            const itensEmEstoque = itens.filter(i => i.status === 'Disponível' && i.quantidade > 0).reduce((acc, i) => acc + i.quantidade, 0);
 
             // ATUALIZA CARDS
             document.getElementById('totalVendasDashboard').textContent = formatarMoeda(totalVendas);
             document.getElementById('creditosGeradosDashboard').textContent = formatarMoeda(creditosGerados);
+            document.getElementById('comissaoLojaDashboard').textContent = formatarMoeda(comissaoTotalLoja);
             document.getElementById('creditosUtilizadosDashboard').textContent = formatarMoeda(creditosUtilizados);
+            document.getElementById('creditosAtivosDashboard').textContent = formatarMoeda(creditosAtivos);
             document.getElementById('itensEmEstoqueDashboard').textContent = itensEmEstoque.toString();
 
             // ATUALIZA TABELA DE ÚLTIMAS VENDAS
             const tbody = document.getElementById('ultimasVendasTable').querySelector('tbody');
             tbody.innerHTML = '';
+            const ultimasVendas = vendasFiltradas.sort((a, b) => new Date(b.dataVenda) - new Date(a.dataVenda)).slice(0, 5);
+
             ultimasVendas.forEach(venda => {
                 const comprador = compradores.find(c => c.id === venda.compradorId);
                 const bazar = bazares.find(b => b.id === venda.bazarVendaId);
@@ -1074,93 +1251,144 @@
                     <td>${formatarMoeda(venda.valorVenda)}</td>
                 `;
             });
-
-            // ATUALIZA GRÁFICOS
-            renderizarGraficoVendasCreditos(vendasFiltradas);
-            renderizarGraficoTopConsignatarios(vendasFiltradas);
+            if (ultimasVendas.length === 0) {
+                 tbody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Nenhuma venda recente.</td></tr>`;
+            }
         }
         
-        function renderizarGraficoVendasCreditos(vendasFiltradas) {
-            const ctx = document.getElementById('vendasCreditosChart').getContext('2d');
-            
-            // Dados (simplificado para os últimos 6 meses com dados de exemplo)
-            const mesesLabels = ['Ago', 'Set', 'Out', 'Nov', 'Dez', 'Jan']; // Exemplo
-            const vendasData = [200, 350, 450, 600, 750, 900];
-            const creditosData = [160, 280, 360, 480, 600, 720];
+        // ========================================
+        // RELATÓRIOS (NOVO)
+        // ========================================
+        function gerarRelatorio() {
+            const tipo = document.getElementById('tipoRelatorio').value;
+            const periodo = document.getElementById('periodoRelatorio').value.trim();
+            const previewArea = document.getElementById('relatorioPreview');
+            previewArea.innerHTML = '';
 
-            if (vendasCreditosChart) vendasCreditosChart.destroy();
+            if (tipo === 'vendas_consignatario') {
+                gerarRelatorioVendasConsignatario(previewArea, periodo);
+            } else if (tipo === 'creditos_ativos') {
+                gerarRelatorioCreditosAtivos(previewArea);
+            } else if (tipo === 'movimentacao_caixa') {
+                 gerarRelatorioMovimentacaoCaixa(previewArea, periodo);
+            }
 
-            vendasCreditosChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: mesesLabels,
-                    datasets: [{
-                        label: 'Total de Vendas (R$)',
-                        data: vendasData,
-                        borderColor: configuracoes.tema === 'dark' ? '#3b82f6' : '#8b5cf6',
-                        backgroundColor: configuracoes.tema === 'dark' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(139, 92, 246, 0.1)',
-                        fill: true,
-                        tension: 0.3
-                    }, {
-                        label: 'Créditos Gerados (R$)',
-                        data: creditosData,
-                        borderColor: configuracoes.tema === 'dark' ? '#10b981' : '#10b981',
-                        backgroundColor: configuracoes.tema === 'dark' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(16, 185, 129, 0.1)',
-                        fill: false,
-                        tension: 0.3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true },
-                        x: { display: true }
-                    },
-                    plugins: { legend: { position: 'top' } }
-                }
-            });
+            // Exemplo de como você chamaria o JS-PDF aqui:
+            // const doc = new window.jspdf.jsPDF();
+            // doc.text(`Relatório de ${tipo}`, 10, 10);
+            // doc.save(`${tipo}_${periodo || 'geral'}.pdf`);
+            mostrarNotificacao('Relatório gerado! (O PDF real precisaria de uma biblioteca configurada para salvar o arquivo)', 'sucesso');
         }
 
-        function renderizarGraficoTopConsignatarios(vendasFiltradas) {
-            const ctx = document.getElementById('topConsignatariosChart').getContext('2d');
-            
-            const consignatariosVendas = {};
-            vendasFiltradas.forEach(v => {
+        function gerarRelatorioVendasConsignatario(previewArea, periodo) {
+            const vendasPorConsignatario = {};
+
+            vendas.forEach(v => {
                 const item = itens.find(i => i.id === v.itemId);
-                if (item) {
-                    const consignatario = clientes.find(c => c.id === item.consignatarioId);
-                    const nome = consignatario ? consignatario.nome : 'Desconhecido';
-                    consignatariosVendas[nome] = (consignatariosVendas[nome] || 0) + v.valorVenda;
+                if (!item) return;
+
+                const consignatario = clientes.find(c => c.id === item.consignatarioId);
+                const nome = consignatario ? consignatario.nome : 'Consignatário Excluído';
+
+                if (!vendasPorConsignatario[nome]) {
+                    vendasPorConsignatario[nome] = { totalVendas: 0, totalCredito: 0, totalItens: 0 };
                 }
+
+                vendasPorConsignatario[nome].totalVendas += v.valorVenda;
+                vendasPorConsignatario[nome].totalCredito += v.creditoGerado;
+                vendasPorConsignatario[nome].totalItens += 1;
+            });
+            
+            const sorted = Object.entries(vendasPorConsignatario).sort(([, a], [, b]) => b.totalVendas - a.totalVendas);
+            
+            let html = `<h4>Relatório de Vendas por Consignatário (Período: ${periodo || 'Geral'})</h4>`;
+            html += `<table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Consignatário</th>
+                                <th>Total de Vendas</th>
+                                <th>Crédito Gerado</th>
+                                <th>Itens Vendidos</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+            sorted.forEach(([nome, dados]) => {
+                html += `<tr>
+                            <td>${nome}</td>
+                            <td>${formatarMoeda(dados.totalVendas)}</td>
+                            <td>${formatarMoeda(dados.totalCredito)}</td>
+                            <td>${dados.totalItens}</td>
+                        </tr>`;
             });
 
-            const sortedVendas = Object.entries(consignatariosVendas).sort(([, a], [, b]) => b - a).slice(0, 5);
-            const labels = sortedVendas.map(([nome]) => nome);
-            const data = sortedVendas.map(([, valor]) => valor);
+            html += `<tr>
+                        <td class="text-info"><strong>TOTAL GERAL</strong></td>
+                        <td class="text-info"><strong>${formatarMoeda(vendas.reduce((acc, v) => acc + v.valorVenda, 0))}</strong></td>
+                        <td class="text-info"><strong>${formatarMoeda(vendas.reduce((acc, v) => acc + v.creditoGerado, 0))}</strong></td>
+                        <td class="text-info"><strong>${vendas.length}</strong></td>
+                    </tr>`;
 
-            if (topConsignatariosChart) topConsignatariosChart.destroy();
-
-            topConsignatariosChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'],
-                        hoverOffset: 10
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'right' }
-                    }
-                }
-            });
+            html += `</tbody></table>`;
+            previewArea.innerHTML = html;
         }
-        
+
+        function gerarRelatorioCreditosAtivos(previewArea) {
+             const html = `
+                <h4>Relatório de Saldos de Crédito Ativos</h4>
+                <p>Este relatório mostra o saldo atual de cada consignatário.</p>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Consignatário</th>
+                            <th>Saldo de Crédito</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${clientes.sort((a, b) => b.creditos - a.creditos).map(c => `
+                            <tr>
+                                <td>${c.id}</td>
+                                <td>${c.nome}</td>
+                                <td class="${(c.creditos || 0) < 0 ? 'text-danger' : 'text-success'}">${formatarMoeda(c.creditos)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            previewArea.innerHTML = html;
+        }
+
+        function gerarRelatorioMovimentacaoCaixa(previewArea, periodo) {
+            const totalComissao = vendas.reduce((acc, v) => acc + v.comissaoLoja, 0);
+            const totalConsumo = consumos.reduce((acc, c) => acc + c.valor, 0);
+            
+            // Simplificado: Assumindo que Consumos são Pagamentos/Saídas do caixa da loja
+            // E Comissões são Entradas
+            
+            const saldoCaixa = totalComissao - totalConsumo;
+
+            const html = `
+                <h4>Relatório de Movimentação de Caixa da Loja (Período: ${periodo || 'Geral'})</h4>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Métrica</th>
+                            <th>Valor</th>
+                            <th>Tipo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Comissão (Lucro Bruto de Vendas)</td><td>${formatarMoeda(totalComissao)}</td><td class="text-success">Entrada</td></tr>
+                        <tr><td>Uso de Crédito (Saídas p/ Consignatário)</td><td>${formatarMoeda(totalConsumo)}</td><td class="text-danger">Saída</td></tr>
+                        <tr><td><strong>SALDO DE CAIXA (Líquido)</strong></td><td class="${saldoCaixa >= 0 ? 'text-success' : 'text-danger'}"><strong>${formatarMoeda(saldoCaixa)}</strong></td><td></td></tr>
+                    </tbody>
+                </table>
+            `;
+            previewArea.innerHTML = html;
+        }
+
+
         // ========================================
         // INICIALIZAÇÃO DO APP
         // ========================================
@@ -1168,6 +1396,9 @@
         document.addEventListener('DOMContentLoaded', () => {
             carregarDados();
             checkInitializers();
+
+            // Adiciona o listener para importação
+            document.getElementById('importFile').addEventListener('change', processarImportacao);
 
             // Atalhos de teclado
             document.addEventListener('keydown', function(e) {
