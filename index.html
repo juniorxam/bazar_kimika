@@ -35,6 +35,7 @@
             <button class="tab-button" onclick="openTab(event, 'bazares')"><i class="fas fa-store"></i> Bazares</button>
             <button class="tab-button" onclick="openTab(event, 'vendas')"><i class="fas fa-cash-register"></i> Vendas</button>
             <button class="tab-button" onclick="openTab(event, 'consumos')"><i class="fas fa-credit-card"></i> Consumos (Crédito)</button>
+            <button class="tab-button" onclick="openTab(event, 'relatorios')"><i class="fas fa-file-invoice-dollar"></i> Relatórios</button>
             <button class="tab-button" onclick="openTab(event, 'config')"><i class="fas fa-cogs"></i> Configurações</button>
         </nav>
 
@@ -72,30 +73,29 @@
                     <p id="totalVendasDashboard" class="metric-value">R$ 0,00</p>
                 </div>
                 <div class="card metric-card">
+                    <i class="fas fa-hand-holding-dollar text-warning"></i>
+                    <h3>Comissão da Loja</h3>
+                    <p id="comissaoLojaDashboard" class="metric-value">R$ 0,00</p>
+                </div>
+                <div class="card metric-card">
                     <i class="fas fa-coins text-success"></i>
                     <h3>Créditos Gerados</h3>
                     <p id="creditosGeradosDashboard" class="metric-value">R$ 0,00</p>
                 </div>
                 <div class="card metric-card">
-                    <i class="fas fa-wallet text-danger"></i>
+                    <i class="fas fa-wallet text-info"></i>
+                    <h3>Créditos Ativos</h3>
+                    <p id="creditosAtivosDashboard" class="metric-value">R$ 0,00</p>
+                </div>
+                <div class="card metric-card">
+                    <i class="fas fa-credit-card text-danger"></i>
                     <h3>Créditos Utilizados</h3>
                     <p id="creditosUtilizadosDashboard" class="metric-value">R$ 0,00</p>
                 </div>
                 <div class="card metric-card">
-                    <i class="fas fa-box-open text-info"></i>
+                    <i class="fas fa-box-open text-primary"></i>
                     <h3>Itens em Estoque</h3>
                     <p id="itensEmEstoqueDashboard" class="metric-value">0</p>
-                </div>
-            </div>
-
-            <div class="charts-container">
-                <div class="card chart-card">
-                    <h3>Vendas x Créditos (Últimos Meses)</h3>
-                    <canvas id="vendasCreditosChart"></canvas>
-                </div>
-                <div class="card chart-card">
-                    <h3>Top 5 Consignatários (Vendas)</h3>
-                    <canvas id="topConsignatariosChart"></canvas>
                 </div>
             </div>
 
@@ -404,7 +404,6 @@
                             </select>
                     </div>
                     <button onclick="limparFiltrosVendas()" class="btn btn-secondary"><i class="fas fa-undo"></i> Limpar Filtros</button>
-                    <button onclick="gerarRelatorioVendas()" class="btn btn-tertiary"><i class="fas fa-file-pdf"></i> Gerar Relatório</button>
                 </div>
                 <div class="table-responsive">
                     <table class="data-table" id="vendasTable">
@@ -496,6 +495,38 @@
                 </div>
             </div>
         </div>
+        
+        <div id="relatorios" class="tab-content">
+            <h2>📊 Relatórios Gerenciais</h2>
+
+            <div class="card form-card">
+                <h3>Opções de Relatório</h3>
+                <div class="form-grid" style="grid-template-columns: repeat(2, 1fr);">
+                    <div class="form-group">
+                        <label for="tipoRelatorio">Tipo de Relatório</label>
+                        <select id="tipoRelatorio">
+                            <option value="vendas_consignatario">Vendas por Consignatário</option>
+                            <option value="creditos_ativos">Saldos de Crédito Ativos</option>
+                            <option value="movimentacao_caixa">Movimentação de Caixa (Loja)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="periodoRelatorio">Período (Ex: Mês/Ano)</label>
+                        <input type="text" id="periodoRelatorio" placeholder="Ex: 10/2025" />
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button onclick="gerarRelatorio()" class="btn btn-primary"><i class="fas fa-print"></i> Gerar Relatório (PDF)</button>
+                </div>
+            </div>
+
+            <div class="card table-card">
+                <h3>Pré-visualização do Relatório</h3>
+                <div id="relatorioPreview" class="table-responsive">
+                    <p style="color: var(--text-muted); text-align: center;">Selecione o tipo de relatório e clique em "Gerar Relatório".</p>
+                </div>
+            </div>
+        </div>
 
         <div id="config" class="tab-content">
             <h2>⚙️ Configurações do Sistema</h2>
@@ -528,7 +559,7 @@
             </div>
 
             <div class="card form-card">
-                <h3>Aparência e Backup</h3>
+                <h3>Aparência, Backup e Dados de Exemplo</h3>
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="temaSistema">Tema</label>
@@ -542,6 +573,7 @@
                     <button onclick="exportarDados()" class="btn btn-secondary"><i class="fas fa-download"></i> Exportar/Backup (JSON)</button>
                     <button onclick="iniciarImportacaoGeral()" class="btn btn-tertiary"><i class="fas fa-upload"></i> Importar/Restaurar (JSON)</button>
                     <button onclick="limparTudo()" class="btn btn-danger"><i class="fas fa-eraser"></i> Limpar TODOS os Dados</button>
+                    <button onclick="carregarDadosDeExemplo()" class="btn btn-primary" style="background-color: var(--success);"><i class="fas fa-flask"></i> Carregar 20 Dados de Exemplo</button>
                 </div>
             </div>
         </div>
