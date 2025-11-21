@@ -51,101 +51,23 @@
             min-height: 100vh;
         }
 
-        /* Sidebar */
-        .sidebar {
-            width: 280px;
-            background-color: var(--sidebar-bg);
-            color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            padding: 20px 0;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-            z-index: 1000;
-        }
-
-        .logo {
-            padding: 0 20px 20px 20px;
-            text-align: center;
-            font-size: 1.5rem;
-            font-weight: 700;
-            border-bottom: 1px solid #374151;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .logo i {
-            margin-right: 10px;
-            color: var(--primary);
-        }
-
-        .nav {
-            flex-grow: 1;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            padding: 15px 20px;
-            color: #d1d5db;
-            text-decoration: none;
-            cursor: pointer;
-            transition: background-color 0.2s, color 0.2s;
-        }
-
-        .nav-item:hover, .nav-item.active {
-            background-color: #1f2937;
-            color: #ffffff;
-            border-left: 4px solid var(--primary);
-            padding-left: 16px;
-        }
-
-        .nav-item i {
-            margin-right: 15px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .logout {
-            padding: 15px 20px;
-            margin-top: auto;
-            border-top: 1px solid #374151;
-        }
-
-        .logout-btn {
-            background: none;
-            border: none;
-            color: #d1d5db;
-            width: 100%;
-            text-align: left;
-            padding: 10px 0;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        .logout-btn:hover {
-            color: var(--danger);
-        }
+        /* Removido o CSS da Sidebar */
 
         /* Main Content */
         .main-content {
             flex-grow: 1;
             padding: 20px;
-            margin-left: 280px;
-            width: calc(100% - 280px);
+            width: 100%; /* Ajustado para 100% da largura, sem a sidebar */
         }
 
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 0px; /* Reduzido para encaixar o menu logo abaixo */
             background-color: var(--card-bg);
             padding: 15px 20px;
-            border-radius: 8px;
+            border-radius: 8px 8px 0 0;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
@@ -180,6 +102,57 @@
             border-radius: 50%;
             margin-left: 10px;
             border: 2px solid var(--primary);
+        }
+
+        /* NOVO: Menu de Abas Superior */
+        .tab-nav {
+            display: flex; /* Alinha os botões horizontalmente */
+            background-color: var(--card-bg); /* Fundo branco ou claro */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Sombra suave */
+            border-bottom: 2px solid var(--border-color); /* Linha sutil abaixo das abas */
+            margin-bottom: 20px; /* Espaço entre o menu e o conteúdo */
+            overflow-x: auto; /* Permite rolagem em telas pequenas */
+            padding: 0 10px;
+            position: sticky; /* Fica fixo ao rolar */
+            top: 0;
+            z-index: 900;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .tab-button {
+            background-color: transparent;
+            border: none;
+            padding: 15px 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--text-muted);
+            transition: color 0.2s, border-bottom 0.2s, background-color 0.2s;
+            white-space: nowrap; /* Evita quebras de linha nos nomes das abas */
+            border-bottom: 3px solid transparent; /* Para o efeito de borda na aba ativa */
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-button:hover:not(.active) {
+            color: var(--text-color);
+            background-color: var(--bg-color); /* Usar cor de fundo para hover */
+        }
+
+        .tab-button.active {
+            color: var(--primary); /* Cor primária para a aba ativa */
+            border-bottom: 3px solid var(--primary); /* Linha destacada para a aba ativa */
+            font-weight: 600;
+        }
+
+        /* Ajuste para o botão Limpar Dados */
+        .tab-button.btn-danger {
+            color: var(--danger);
+            margin-left: auto; /* Empurra para a direita */
+        }
+        .tab-button.btn-danger:hover {
+            background-color: var(--danger);
+            color: white;
         }
 
         /* Tabs Content */
@@ -708,15 +681,6 @@
 
         /* Media Queries para Responsividade */
         @media (max-width: 1024px) {
-            .sidebar {
-                width: 220px;
-            }
-
-            .main-content {
-                margin-left: 220px;
-                width: calc(100% - 220px);
-            }
-
             .charts-container {
                 grid-template-columns: 1fr;
             }
@@ -727,50 +691,7 @@
         }
 
         @media (max-width: 768px) {
-            .sidebar {
-                position: static;
-                width: 100%;
-                height: auto;
-                flex-direction: row;
-                justify-content: space-around;
-                align-items: center;
-                padding: 10px 0;
-            }
-
-            .logo {
-                display: none;
-            }
-
-            .nav {
-                display: flex;
-                flex-grow: 0;
-            }
-
-            .nav-item {
-                padding: 10px 15px;
-                border-left: none !important;
-                border-bottom: 3px solid transparent;
-            }
-            
-            .nav-item.active {
-                border-bottom: 3px solid var(--primary) !important;
-            }
-
-            .nav-item span {
-                display: none;
-            }
-
-            .nav-item i {
-                margin-right: 0;
-            }
-
-            .logout {
-                display: none;
-            }
-
             .main-content {
-                margin-left: 0;
-                width: 100%;
                 padding: 10px;
             }
             
@@ -781,6 +702,20 @@
             
             .header h1 {
                 margin-bottom: 10px;
+            }
+
+            .tab-nav {
+                padding: 0; /* Remove padding lateral para telas menores */
+                justify-content: flex-start;
+            }
+
+            .tab-button {
+                font-size: 0.9rem;
+                padding: 12px 10px;
+            }
+
+            .tab-button i {
+                margin-right: 0; /* Remove margem para focar no ícone */
             }
 
             .dashboard-grid {
@@ -813,38 +748,6 @@
 </head>
 <body>
     
-    <aside class="sidebar">
-        <div class="logo">
-            <i class="fas fa-store"></i> BazarPlus <span style="font-size: 0.7rem; background: var(--primary); padding: 2px 5px; border-radius: 10px; margin-left: 5px;">PRO</span>
-        </div>
-        <nav class="nav">
-            <a class="nav-item active" onclick="abrirTab('dashboard')">
-                <i class="fas fa-chart-line"></i> <span>Dashboard</span>
-            </a>
-            <a class="nav-item" onclick="abrirTab('bazares')">
-                <i class="fas fa-calendar-alt"></i> <span>Bazares</span>
-            </a>
-            <a class="nav-item" onclick="abrirTab('itens')">
-                <i class="fas fa-tshirt"></i> <span>Itens</span>
-            </a>
-            <a class="nav-item" onclick="abrirTab('vendas')">
-                <i class="fas fa-cash-register"></i> <span>Vendas</span>
-            </a>
-            <a class="nav-item" onclick="abrirTab('clientes')">
-                <i class="fas fa-users"></i> <span>Clientes</span>
-            </a>
-            <a class="nav-item" onclick="abrirTab('relatorios')">
-                <i class="fas fa-file-invoice-dollar"></i> <span>Relatórios</span>
-            </a>
-            <a class="nav-item" onclick="abrirTab('configuracoes')">
-                <i class="fas fa-cog"></i> <span>Configurações</span>
-            </a>
-        </nav>
-        <div class="logout">
-            <button class="logout-btn" onclick="limparTudo()"><i class="fas fa-power-off"></i> Limpar Dados (Reiniciar)</button>
-        </div>
-    </aside>
-
     <main class="main-content">
         <header class="header">
             <h1>BazarKimika - Gestão de Bazares e Créditos</h1>
@@ -859,6 +762,16 @@
             </div>
         </header>
 
+        <nav class="tab-nav">
+            <button class="tab-button active" onclick="abrirTab('dashboard')"><i class="fas fa-chart-line"></i> Dashboard</button>
+            <button class="tab-button" onclick="abrirTab('bazares')"><i class="fas fa-calendar-alt"></i> Bazares</button>
+            <button class="tab-button" onclick="abrirTab('itens')"><i class="fas fa-tshirt"></i> Itens</button>
+            <button class="tab-button" onclick="abrirTab('vendas')"><i class="fas fa-cash-register"></i> Vendas</button>
+            <button class="tab-button" onclick="abrirTab('clientes')"><i class="fas fa-users"></i> Clientes</button>
+            <button class="tab-button" onclick="abrirTab('relatorios')"><i class="fas fa-file-invoice-dollar"></i> Relatórios</button>
+            <button class="tab-button" onclick="abrirTab('configuracoes')"><i class="fas fa-cog"></i> Configurações</button>
+            <button class="tab-button btn-danger" onclick="limparTudo()"><i class="fas fa-power-off"></i> Limpar Dados</button>
+        </nav>
         <div id="dashboard" class="tab-content active">
             <h2 class="section-title"><i class="fas fa-chart-line"></i> Visão Geral do Bazar</h2>
 
@@ -913,8 +826,7 @@
                             </tr>
                         </thead>
                         <tbody id="topClientes">
-                            <!-- Top clientes será carregado aqui -->
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
             </div>
@@ -922,8 +834,7 @@
             <div class="card">
                 <h2><i class="fas fa-bell"></i> Lembretes e Alertas</h2>
                 <div id="lista-lembretes">
-                    <!-- Lembretes serão carregados aqui -->
-                </div>
+                    </div>
             </div>
         </div>
 
@@ -983,8 +894,7 @@
                             </tr>
                         </thead>
                         <tbody id="listaBazares">
-                            <!-- Bazares serão carregados aqui -->
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
             </div>
@@ -997,7 +907,7 @@
                 <h2><i class="fas fa-plus-circle"></i> Novo Item</h2>
                 
                 <div class="form-grid">
-                    <div class="form-group">
+                    <input type="hidden" id="itemIdEdit" value=""> <div class="form-group">
                         <label for="itemDescricao">Descrição *</label>
                         <input type="text" id="itemDescricao" placeholder="Ex: Vestido floral tamanho M" required>
                     </div>
@@ -1050,8 +960,8 @@
                     </div>
                 </div>
 
-                <div class="action-buttons">
-                    <button onclick="adicionarItem()" class="btn btn-primary">
+                <div class="action-buttons" id="item-action-buttons">
+                    <button onclick="adicionarItem()" class="btn btn-primary" id="btnCadastrarItem">
                         <i class="fas fa-check-circle"></i> Cadastrar Item
                     </button>
                     <button onclick="limparFormularioItem()" class="btn btn-secondary">
@@ -1090,8 +1000,7 @@
                 </div>
 
                 <div class="itens-grid" id="lista-itens">
-                    <!-- Itens serão carregados aqui -->
-                </div>
+                    </div>
             </div>
         </div>
 
@@ -1111,7 +1020,7 @@
                     
                     <div class="form-group">
                         <label for="vendaPreco">Preço de Venda (R$) *</label>
-                        <input type="number" id="vendaPreco" step="0.01" min="0" required>
+                        <input type="number" id="vendaPreco" step="0.01" min="0" required oninput="calcularResumoVenda()">
                     </div>
 
                     <div class="form-group">
@@ -1163,51 +1072,52 @@
                         <input type="date" id="filtroDataFimVenda" onchange="filtrarVendas()">
                     </div>
                     <div class="filtro-item">
-                        <label for="filtroClienteVenda">Cliente</label>
-                        <input type="text" id="filtroClienteVenda" placeholder="Filtrar por cliente" oninput="filtrarVendas()">
+                        <label for="filtroCliente">Cliente</label>
+                        <input type="text" id="filtroClienteVenda" placeholder="Nome do cliente" oninput="filtrarVendas()">
                     </div>
                 </div>
-                
+
                 <div class="table-responsive">
                     <table class="tabela-dados">
                         <thead>
                             <tr>
                                 <th>Data</th>
                                 <th>Item</th>
-                                <th>Cliente Dono</th>
-                                <th>Preço Venda</th>
-                                <th>Crédito Gerado</th>
+                                <th>Cliente</th>
+                                <th>Valor Venda</th>
+                                <th>Crédito Cliente</th>
                                 <th>Comissão Loja</th>
                                 <th>Pagamento</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody id="listaVendas">
-                            <!-- Vendas serão carregadas aqui -->
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
         <div id="clientes" class="tab-content">
+            <h2 class="section-title"><i class="fas fa-users"></i> Gestão de Clientes</h2>
+
             <div class="card">
-                <h2><i class="fas fa-users"></i> Cadastro de Clientes</h2>
+                <h2><i class="fas fa-plus-circle"></i> Novo Cliente</h2>
                 
                 <div class="form-grid">
-                    <div class="form-group">
-                        <label for="clienteNome">Nome *</label>
-                        <input type="text" id="clienteNome" placeholder="Nome completo" required>
+                    <input type="hidden" id="clienteIdEdit" value=""> <div class="form-group">
+                        <label for="clienteNome">Nome Completo *</label>
+                        <input type="text" id="clienteNome" placeholder="Ex: Maria da Silva" required>
                     </div>
                     
                     <div class="form-group">
                         <label for="clienteTelefone">Telefone *</label>
-                        <input type="tel" id="clienteTelefone" placeholder="(11) 99999-9999" required>
+                        <input type="tel" id="clienteTelefone" placeholder="(XX) XXXXX-XXXX" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="clienteCPF">CPF</label>
-                        <input type="text" id="clienteCPF" placeholder="000.000.000-00">
+                        <label for="clienteCpf">CPF</label>
+                        <input type="text" id="clienteCpf" placeholder="000.000.000-00">
                     </div>
 
                     <div class="form-group">
@@ -1221,8 +1131,8 @@
                     </div>
                 </div>
 
-                <div class="action-buttons">
-                    <button onclick="adicionarCliente()" class="btn btn-primary">
+                <div class="action-buttons" id="cliente-action-buttons">
+                    <button onclick="adicionarCliente()" class="btn btn-primary" id="btnCadastrarCliente">
                         <i class="fas fa-check-circle"></i> Cadastrar Cliente
                     </button>
                     <button onclick="limparFormularioCliente()" class="btn btn-secondary">
@@ -1248,7 +1158,7 @@
                         <input type="text" id="filtroNomeCliente" placeholder="Filtrar por nome" oninput="filtrarClientes()">
                     </div>
                 </div>
-                
+
                 <div class="table-responsive">
                     <table class="tabela-dados">
                         <thead>
@@ -1264,8 +1174,7 @@
                             </tr>
                         </thead>
                         <tbody id="listaClientes">
-                            <!-- Clientes serão carregados aqui -->
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
             </div>
@@ -1274,7 +1183,6 @@
         <div id="relatorios" class="tab-content">
             <div class="card">
                 <h2><i class="fas fa-file-pdf"></i> Relatórios Detalhados</h2>
-                
                 <div class="tabs-internal">
                     <div class="tab-internal active" onclick="abrirRelatorioTab('creditos')">Créditos</div>
                     <div class="tab-internal" onclick="abrirRelatorioTab('vendas')">Vendas</div>
@@ -1283,100 +1191,106 @@
                     <div class="tab-internal" onclick="abrirRelatorioTab('bazares')">Bazares</div>
                 </div>
                 
-                <div id="relatorio-creditos" class="relatorio-tab">
-                    <h3><i class="fas fa-coins"></i> Relatório de Créditos</h3>
-                    <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
-                        <div class="form-group">
-                            <label for="dataInicioCredito">Data Inicial</label>
-                            <input type="date" id="dataInicioCredito">
-                        </div>
-                        <div class="form-group">
-                            <label for="dataFimCredito">Data Final</label>
-                            <input type="date" id="dataFimCredito">
-                        </div>
-                    </div>
+                <div id="relatorio-creditos" class="tab-content-internal active">
+                    <p>Gera um relatório de todos os créditos gerados para os clientes, detalhando os saldos atuais e os totais de vendas.</p>
                     <div class="action-buttons">
-                        <button onclick="gerarRelatorioCreditosPDF()" class="btn btn-primary"><i class="fas fa-file-pdf"></i> Gerar Relatório PDF</button>
-                        <button onclick="gerarRankingCreditos()" class="btn btn-info"><i class="fas fa-trophy"></i> Ranking de Créditos</button>
+                        <button onclick="gerarRelatorioCreditosPDF()" class="btn btn-primary">
+                            <i class="fas fa-download"></i> Gerar Relatório de Créditos (PDF)
+                        </button>
+                    </div>
+                </div>
+
+                <div id="relatorio-vendas" class="tab-content-internal" style="display:none;">
+                    <p>Gera um relatório detalhado de todas as vendas, incluindo valores de venda, crédito do cliente e comissão da loja.</p>
+                    <div class="action-buttons">
+                        <button onclick="gerarRelatorioVendasPDF()" class="btn btn-primary">
+                            <i class="fas fa-download"></i> Gerar Relatório de Vendas (PDF)
+                        </button>
+                    </div>
+                </div>
+
+                <div id="relatorio-clientes" class="tab-content-internal" style="display:none;">
+                    <p>Gera uma lista completa de clientes com seus dados de contato e resumo financeiro (créditos, itens vendidos).</p>
+                    <div class="action-buttons">
+                        <button onclick="gerarRelatorioClientesPDF()" class="btn btn-primary">
+                            <i class="fas fa-download"></i> Gerar Relatório de Clientes (PDF)
+                        </button>
+                    </div>
+                </div>
+
+                <div id="relatorio-itens" class="tab-content-internal" style="display:none;">
+                    <p>Gera uma lista de todos os itens cadastrados, com status (disponível, vendido) e o cliente dono.</p>
+                    <div class="action-buttons">
+                        <button onclick="gerarRelatorioItensPDF()" class="btn btn-primary">
+                            <i class="fas fa-download"></i> Gerar Relatório de Itens (PDF)
+                        </button>
+                    </div>
+                </div>
+
+                <div id="relatorio-bazares" class="tab-content-internal" style="display:none;">
+                    <p>Gera um resumo dos bazares realizados, incluindo total de vendas e número de itens envolvidos.</p>
+                    <div class="action-buttons">
+                        <button onclick="gerarRelatorioBazaresPDF()" class="btn btn-primary">
+                            <i class="fas fa-download"></i> Gerar Relatório de Bazares (PDF)
+                        </button>
                     </div>
                 </div>
                 
-                <div id="relatorio-vendas" class="relatorio-tab" style="display: none;">
-                    <h3><i class="fas fa-chart-line"></i> Relatório de Vendas</h3>
-                    <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
-                        <div class="form-group">
-                            <label for="dataInicioVendaRel">Data Inicial</label>
-                            <input type="date" id="dataInicioVendaRel">
-                        </div>
-                        <div class="form-group">
-                            <label for="dataFimVendaRel">Data Final</label>
-                            <input type="date" id="dataFimVendaRel">
-                        </div>
-                    </div>
-                    <div class="action-buttons">
-                        <button onclick="gerarRelatorioVendasPDF()" class="btn btn-primary"><i class="fas fa-file-pdf"></i> Relatório de Vendas PDF</button>
-                    </div>
-                </div>
-                
-                <div id="relatorio-clientes" class="relatorio-tab" style="display: none;">
-                    <h3><i class="fas fa-users"></i> Relatório de Clientes</h3>
-                    <div class="action-buttons">
-                        <button onclick="gerarRelatorioClientesPDF()" class="btn btn-primary"><i class="fas fa-file-pdf"></i> Relatório de Clientes PDF</button>
-                        <button onclick="gerarTopClientes()" class="btn btn-success"><i class="fas fa-crown"></i> Top 10 Clientes</button>
-                    </div>
-                </div>
-                
-                <div id="relatorio-itens" class="relatorio-tab" style="display: none;">
-                    <h3><i class="fas fa-tshirt"></i> Relatório de Itens</h3>
-                    <div class="action-buttons">
-                        <button onclick="gerarRelatorioItensPDF()" class="btn btn-primary"><i class="fas fa-file-pdf"></i> Relatório de Itens PDF</button>
-                        <button onclick="gerarItensNaoVendidos()" class="btn btn-warning"><i class="fas fa-exclamation-triangle"></i> Itens Não Vendidos</button>
-                    </div>
-                </div>
-                
-                <div id="relatorio-bazares" class="relatorio-tab" style="display: none;">
-                    <h3><i class="fas fa-calendar-alt"></i> Relatório de Bazares</h3>
-                    <div class="action-buttons">
-                        <button onclick="gerarRelatorioBazaresPDF()" class="btn btn-primary"><i class="fas fa-file-pdf"></i> Relatório de Bazares PDF</button>
-                        <button onclick="compararBazares()" class="btn btn-info"><i class="fas fa-chart-bar"></i> Comparar Bazares</button>
-                    </div>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-chart-bar"></i> Análises e Comparações</h2>
+                <div class="action-buttons">
+                    <button onclick="gerarRankingCreditos()" class="btn btn-info">
+                        <i class="fas fa-medal"></i> Ranking de Clientes (Créditos)
+                    </button>
+                    <button onclick="gerarItensNaoVendidos()" class="btn btn-warning">
+                        <i class="fas fa-box-open"></i> Itens para Próximo Bazar
+                    </button>
+                    <button onclick="compararBazares()" class="btn btn-primary">
+                        <i class="fas fa-exchange-alt"></i> Comparar Desempenho de Bazares
+                    </button>
                 </div>
             </div>
         </div>
 
         <div id="configuracoes" class="tab-content">
+            <h2 class="section-title"><i class="fas fa-cog"></i> Configurações do Sistema</h2>
+
             <div class="card">
-                <h2><i class="fas fa-cog"></i> Configurações do Sistema</h2>
+                <h2><i class="fas fa-percent"></i> Regras de Negócio</h2>
                 
-                <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="form-grid">
                     <div class="form-group">
                         <label for="percentualCliente">Percentual do Cliente (%)</label>
                         <input type="number" id="percentualCliente" step="0.01" min="0" max="100" value="80" required>
                     </div>
+                    
                     <div class="form-group">
                         <label for="percentualLoja">Percentual da Loja (%)</label>
                         <input type="number" id="percentualLoja" step="0.01" min="0" max="100" value="20" required>
                     </div>
+
                     <div class="form-group">
                         <label for="validadeCredito">Validade do Crédito (meses)</label>
                         <input type="number" id="validadeCredito" min="0" value="6">
                     </div>
+
                     <div class="form-group">
                         <label for="alertaEstoque">Alerta Estoque Baixo (itens)</label>
                         <input type="number" id="alertaEstoque" min="0" value="5">
                     </div>
                 </div>
-                
+
                 <div class="action-buttons">
                     <button onclick="salvarConfiguracoes()" class="btn btn-primary">
                         <i class="fas fa-save"></i> Salvar Configurações
                     </button>
                 </div>
             </div>
-            
+
             <div class="card">
                 <h2><i class="fas fa-database"></i> Backup e Restauração</h2>
-                
                 <div class="action-buttons">
                     <button onclick="exportarDados()" class="btn btn-info">
                         <i class="fas fa-download"></i> Exportar Dados
@@ -1388,71 +1302,50 @@
                         <i class="fas fa-sync"></i> Backup Automático
                     </button>
                 </div>
-                
                 <div id="backup-status" style="margin-top: 15px; padding: 10px; background: var(--bg-color); border-radius: 6px;">
                     <p><i class="fas fa-info-circle"></i> Último backup: <span id="ultimoBackup">Nunca</span></p>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2><i class="fas fa-box"></i> Dados de Exemplo</h2>
-                <p style="margin-bottom: 15px; color: var(--text-muted);">
-                    <i class="fas fa-info-circle"></i> Use esta opção para carregar dados de exemplo e testar o sistema.
-                </p>
-                <div class="action-buttons">
-                    <button onclick="criarDadosExemplo()" class="btn btn-success">
-                        <i class="fas fa-magic"></i> Carregar Dados de Exemplo
-                    </button>
                 </div>
             </div>
         </div>
 
     </main>
-    
-    <!-- Modal para Detalhes do Cliente -->
-    <div class="modal" id="modalCliente">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-user"></i> Detalhes do Cliente</h2>
-                <button class="modal-close" onclick="fecharModalCliente()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div id="detalhesClienteConteudo">
-                    <!-- Conteúdo será carregado aqui -->
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button onclick="fecharModalCliente()" class="btn btn-secondary">Fechar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal para Cupom de Crédito -->
-    <div class="modal" id="modalCupom">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-ticket-alt"></i> Cupom de Crédito</h2>
-                <button class="modal-close" onclick="fecharModalCupom()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div id="conteudoCupom" style="text-align: center; padding: 20px;">
-                    <!-- Cupom será gerado aqui -->
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button onclick="imprimirCupom()" class="btn btn-primary"><i class="fas fa-print"></i> Imprimir</button>
-                <button onclick="fecharModalCupom()" class="btn btn-secondary">Fechar</button>
-            </div>
-        </div>
-    </div>
 
     <div id="notification-area"></div>
 
+    <div id="detalhesModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="detalhesModalTitulo">Detalhes</h2>
+                <button class="modal-close" onclick="fecharModal('detalhesModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="detalhesModalConteudo">
+                </div>
+            <div class="modal-footer" id="detalhesModalFooter">
+                <button class="btn btn-secondary" onclick="fecharModal('detalhesModal')">Fechar</button>
+            </div>
+        </div>
+    </div>
+    <div id="detalhesClienteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="detalhesClienteTitulo">Detalhes do Cliente</h2>
+                <button class="modal-close" onclick="fecharModal('detalhesClienteModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="detalhesClienteConteudo">
+                </div>
+        </div>
+    </div>
+
+
     <script>
+        // Use window.jspdf e window.Chart para evitar problemas de escopo
+        const { jsPDF } = window.jspdf;
+        let vendasCreditosChartInstance = null;
+        let statusItensChartInstance = null;
+
         // ========================================
-        // VARIÁVEIS GLOBAIS E CONFIGURAÇÕES
+        // DADOS GLOBAIS
         // ========================================
-        
         let bazares = [];
         let itens = [];
         let clientes = [];
@@ -1460,53 +1353,52 @@
         let configuracoes = {
             percentualCliente: 80,
             percentualLoja: 20,
-            validadeCredito: 6,
+            validadeCredito: 6, // meses
             alertaEstoque: 5,
-            tema: 'light',
-            backupAutomatico: true
+            tema: 'light'
         };
-        
-        let vendasCreditosChartInstance = null;
-        let statusItensChartInstance = null;
 
         // ========================================
         // FUNÇÕES UTILITÁRIAS
         // ========================================
-
         function formatarMoeda(valor) {
-            return new Intl.NumberFormat('pt-BR', {
-                style: 'currency',
-                currency: 'BRL'
-            }).format(valor);
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
+        }
+
+        function gerarId(array) {
+            return array.length > 0 ? Math.max(...array.map(item => item.id)) + 1 : 1;
         }
 
         function obterDataHojeISO() {
             return new Date().toISOString().split('T')[0];
         }
 
+        function abrirModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function fecharModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
         function mostrarNotificacao(mensagem, tipo = 'info') {
             const area = document.getElementById('notification-area');
             const notif = document.createElement('div');
             notif.className = `notification ${tipo}`;
-            
             const icones = {
                 'sucesso': 'fa-check-circle',
                 'erro': 'fa-exclamation-circle',
                 'aviso': 'fa-exclamation-triangle',
                 'info': 'fa-info-circle'
             };
-            
             notif.innerHTML = `
                 <i class="fas ${icones[tipo] || 'fa-info-circle'}"></i>
                 <span>${mensagem}</span>
             `;
-            
             area.appendChild(notif);
-            
             // Força o reflow para aplicar a transição
-            void notif.offsetWidth; 
+            void notif.offsetWidth;
             notif.classList.add('show');
-
             setTimeout(() => {
                 notif.classList.remove('show');
                 setTimeout(() => {
@@ -1519,21 +1411,17 @@
             const body = document.body;
             const temaAtual = body.getAttribute('data-theme') || 'light';
             const novoTema = temaAtual === 'light' ? 'dark' : 'light';
-            
             body.setAttribute('data-theme', novoTema);
             configuracoes.tema = novoTema;
             salvarDados();
-            
             const icon = document.querySelector('.theme-toggle i');
             icon.className = novoTema === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-            
             mostrarNotificacao(`Tema ${novoTema === 'dark' ? 'escuro' : 'claro'} ativado`, 'sucesso');
         }
 
         // ========================================
         // PERSISTÊNCIA DE DADOS (LocalStorage)
         // ========================================
-
         function salvarDados() {
             localStorage.setItem('bazarPlus_bazares', JSON.stringify(bazares));
             localStorage.setItem('bazarPlus_itens', JSON.stringify(itens));
@@ -1548,250 +1436,194 @@
             const dadosClientes = localStorage.getItem('bazarPlus_clientes');
             const dadosVendas = localStorage.getItem('bazarPlus_vendas');
             const dadosConfig = localStorage.getItem('bazarPlus_config');
-            
+
             if (dadosBazares) bazares = JSON.parse(dadosBazares);
             if (dadosItens) itens = JSON.parse(dadosItens);
             if (dadosClientes) clientes = JSON.parse(dadosClientes);
             if (dadosVendas) vendas = JSON.parse(dadosVendas);
-            if (dadosConfig) {
-                configuracoes = { ...configuracoes, ...JSON.parse(dadosConfig) };
+            if (dadosConfig) configuracoes = { ...configuracoes, ...JSON.parse(dadosConfig) };
+
+            // Se não houver dados, carrega exemplos
+            if (bazares.length === 0 && itens.length === 0 && clientes.length === 0) {
+                carregarExemplos();
             }
         }
 
+        function carregarExemplos() {
+            // Clientes exemplo
+            const clientesExemplo = [
+                { id: 1, nome: "Ana Paula Silva", telefone: "(11) 98765-4321", cpf: "111.111.111-11", email: "ana@exemplo.com", observacao: "Gosta de roupas tamanho M", status: "ativo", creditos: 120.00 },
+                { id: 2, nome: "Beatriz Oliveira", telefone: "(21) 99887-7665", cpf: "222.222.222-22", email: "bia@exemplo.com", observacao: "Sapatos 37", status: "ativo", creditos: 0.00 },
+                { id: 3, nome: "Carlos Eduardo", telefone: "(31) 95544-3322", cpf: "333.333.333-33", email: "carlos@exemplo.com", observacao: "", status: "ativo", creditos: 0.00 }
+            ];
+            clientes = clientesExemplo;
+
+            // Bazares exemplo
+            const bazaresExemplo = [
+                { id: 1, nome: "Bazar de Verão 2024", data: '2024-03-15', tema: "Roupas de Verão", observacao: "Realizado no salão principal", status: "finalizado", itensCadastrados: 8, itensVendidos: 5, totalVendas: 625.00 },
+                { id: 2, nome: "Bazar de Outono", data: '2024-05-20', tema: "Roupas de Outono", observacao: "", status: "ativo", itensCadastrados: 6, itensVendidos: 0, totalVendas: 0 }
+            ];
+            bazares = bazaresExemplo;
+
+            // Itens exemplo
+            const itensExemplo = [
+                { id: 1, descricao: "Vestido floral verão", clienteId: 1, categoria: "roupa", preco: 80.00, tamanho: "M", marca: "Zara", estado: "seminovo", observacao: "Cor azul com flores", status: "vendido", bazarId: 1, dataCadastro: '2024-03-10' },
+                { id: 2, descricao: "Blusa de tricô", clienteId: 2, categoria: "roupa", preco: 45.00, tamanho: "G", marca: "C&A", estado: "usado", observacao: "Cor bege", status: "vendido", bazarId: 1, dataCadastro: '2024-03-12' },
+                { id: 3, descricao: "Bolsa de couro", clienteId: 1, categoria: "bolsa", preco: 120.00, tamanho: "Único", marca: "Animale", estado: "disponivel", bazarId: 2, dataCadastro: '2024-05-15' },
+                { id: 4, descricao: "Sandália saltinho", clienteId: 3, categoria: "calcado", preco: 60.00, tamanho: "36", marca: "Arezzo", estado: "seminovo", observacao: "Cor vermelha", status: "vendido", bazarId: 1, dataCadastro: '2024-03-10' },
+                { id: 5, descricao: "Calça Jeans skinny", clienteId: 1, categoria: "roupa", preco: 100.00, tamanho: "40", marca: "Levi's", estado: "seminovo", observacao: "", status: "vendido", bazarId: 1, dataCadastro: '2024-03-12' },
+                { id: 6, descricao: "Óculos de sol", clienteId: 2, categoria: "acessorio", preco: 50.00, tamanho: "Único", marca: "Ray-Ban", estado: "novo", observacao: "Com case", status: "vendido", bazarId: 1, dataCadastro: '2024-03-15' },
+                { id: 7, descricao: "Casaco de lã", clienteId: 3, categoria: "roupa", preco: 150.00, tamanho: "P", marca: "Renner", estado: "seminovo", observacao: "Ótimo estado", status: "proximo-bazar", bazarId: 2, dataCadastro: '2024-05-18' },
+                { id: 8, descricao: "Blazer preto", clienteId: 1, categoria: "roupa", preco: 95.00, tamanho: "M", marca: "Zara", estado: "seminovo", observacao: "", status: "disponivel", bazarId: 2, dataCadastro: '2024-05-20' },
+            ];
+            itens = itensExemplo;
+
+            // Vendas exemplo (Calculadas com a comissão padrão 80/20)
+            const vendasExemplo = [
+                { id: 1, itemId: 1, precoVenda: 80.00, dataVenda: '2024-03-15', formaPagamento: 'pix', creditoCliente: 64.00, comissaoLoja: 16.00 }, // Ana (80)
+                { id: 2, itemId: 2, precoVenda: 45.00, dataVenda: '2024-03-15', formaPagamento: 'dinheiro', creditoCliente: 36.00, comissaoLoja: 9.00 }, // Bia (45)
+                { id: 3, itemId: 4, precoVenda: 60.00, dataVenda: '2024-03-15', formaPagamento: 'cartao', creditoCliente: 48.00, comissaoLoja: 12.00 }, // Carlos (60)
+                { id: 4, itemId: 5, precoVenda: 100.00, dataVenda: '2024-03-15', formaPagamento: 'pix', creditoCliente: 80.00, comissaoLoja: 20.00 }, // Ana (100)
+                { id: 5, itemId: 6, precoVenda: 50.00, dataVenda: '2024-03-15', formaPagamento: 'dinheiro', creditoCliente: 40.00, comissaoLoja: 10.00 } // Bia (50)
+            ];
+            vendas = vendasExemplo;
+            
+            // Atualiza crédito do cliente Ana Paula (64 + 80 = 144.00), mas como o exemplo tem 120.00, vamos manter a lógica:
+            // Ana: 64.00 + 80.00 = 144.00. 
+            // Beatriz: 36.00 + 40.00 = 76.00.
+            // Carlos: 48.00.
+            
+            clientes[0].creditos = 144.00; // Ana
+            clientes[1].creditos = 76.00; // Beatriz
+            clientes[2].creditos = 48.00; // Carlos
+
+            mostrarNotificacao('Dados de exemplo carregados!', 'info');
+        }
+
         function limparTudo() {
-            if (confirm('ATENÇÃO: Você tem certeza que deseja APAGAR TODOS os dados? Esta ação é irreversível.')) {
-                localStorage.removeItem('bazarPlus_bazares');
-                localStorage.removeItem('bazarPlus_itens');
-                localStorage.removeItem('bazarPlus_clientes');
-                localStorage.removeItem('bazarPlus_vendas');
-                localStorage.removeItem('bazarPlus_config');
+            if (confirm('Tem certeza que deseja limpar TODOS os dados? Esta ação não pode ser desfeita.')) {
+                localStorage.clear();
                 bazares = [];
                 itens = [];
                 clientes = [];
                 vendas = [];
+                configuracoes = {
+                    percentualCliente: 80,
+                    percentualLoja: 20,
+                    validadeCredito: 6,
+                    alertaEstoque: 5,
+                    tema: 'light'
+                };
+                carregarExemplos(); // Recarrega os exemplos após a limpeza
                 checkInitializers();
-                mostrarNotificacao('Todos os dados foram limpos com sucesso!', 'sucesso');
+                mostrarNotificacao('Todos os dados foram resetados e exemplos carregados!', 'sucesso');
             }
         }
 
         // ========================================
-        // INICIALIZAÇÃO E DADOS EXEMPLO
+        // GESTÃO DE TABS
         // ========================================
+        function abrirTab(tabName) {
+            // Esconde todos os conteúdos
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
 
-        function criarDadosExemplo() {
-            if (!confirm('Isso irá substituir os dados atuais por dados de exemplo. Continuar?')) return;
+            // Remove a classe 'active' de todos os botões de abas
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
 
-            // Clientes exemplo
-            const clientesExemplo = [
-                {
-                    id: 1,
-                    nome: "Maria Silva",
-                    telefone: "(11) 99999-1111",
-                    cpf: "123.456.789-00",
-                    email: "maria@email.com",
-                    observacao: "Cliente frequente",
-                    creditos: 320.00,
-                    status: "ativo",
-                    dataCadastro: '2024-01-15'
-                },
-                {
-                    id: 2,
-                    nome: "João Santos",
-                    telefone: "(11) 99999-2222",
-                    cpf: "987.654.321-00",
-                    email: "joao@email.com",
-                    observacao: "Prefere roupas masculinas",
-                    creditos: 180.00,
-                    status: "ativo",
-                    dataCadastro: '2024-02-10'
-                },
-                {
-                    id: 3,
-                    nome: "Ana Costa",
-                    telefone: "(11) 99999-3333",
-                    cpf: "456.789.123-00",
-                    email: "ana@email.com",
-                    observacao: "",
-                    creditos: 95.00,
-                    status: "ativo",
-                    dataCadastro: '2024-03-05'
-                }
-            ];
+            // Mostra o conteúdo da aba selecionada
+            const tabContent = document.getElementById(tabName);
+            if (tabContent) {
+                tabContent.classList.add('active');
+            } else {
+                mostrarNotificacao(`Aba '${tabName}' não encontrada.`, 'erro');
+                return;
+            }
 
-            // Bazares exemplo
-            const bazaresExemplo = [
-                {
-                    id: 1,
-                    nome: "Bazar de Verão 2024",
-                    data: '2024-03-15',
-                    tema: "Roupas de Verão",
-                    observacao: "Realizado no salão principal",
-                    status: "finalizado",
-                    itensCadastrados: 8,
-                    itensVendidos: 5,
-                    totalVendas: 625.00
-                },
-                {
-                    id: 2,
-                    nome: "Bazar de Outono",
-                    data: '2024-05-20',
-                    tema: "Roupas de Outono",
-                    observacao: "",
-                    status: "ativo",
-                    itensCadastrados: 6,
-                    itensVendidos: 0,
-                    totalVendas: 0
-                }
-            ];
+            // Adiciona a classe 'active' ao botão que foi clicado
+            const selectedButton = document.querySelector(`.tab-button[onclick="abrirTab('${tabName}')"]`);
+            if (selectedButton) {
+                selectedButton.classList.add('active');
+            }
 
-            // Itens exemplo
-            const itensExemplo = [
-                {
-                    id: 1,
-                    descricao: "Vestido floral verão",
-                    clienteId: 1,
-                    categoria: "roupa",
-                    preco: 80.00,
-                    tamanho: "M",
-                    marca: "Zara",
-                    estado: "seminovo",
-                    observacao: "Cor azul com flores",
-                    status: "vendido",
-                    bazarId: 1,
-                    dataCadastro: '2024-03-10'
-                },
-                {
-                    id: 2,
-                    descricao: "Blusa de tricô",
-                    clienteId: 2,
-                    categoria: "roupa",
-                    preco: 45.00,
-                    tamanho: "G",
-                    marca: "C&A",
-                    estado: "usado",
-                    observacao: "Cor bege",
-                    status: "vendido",
-                    bazarId: 1,
-                    dataCadastro: '2024-03-12'
-                },
-                {
-                    id: 3,
-                    descricao: "Bolsa de couro",
-                    clienteId: 1,
-                    categoria: "bolsa",
-                    preco: 120.00,
-                    tamanho: "Único",
-                    marca: "Animale",
-                    estado: "seminovo",
-                    observacao: "Couro legítimo",
-                    status: "disponivel",
-                    bazarId: 2,
-                    dataCadastro: '2024-05-15'
-                },
-                {
-                    id: 4,
-                    descricao: "Sandália saltinho",
-                    clienteId: 3,
-                    categoria: "calcado",
-                    preco: 60.00,
-                    tamanho: "36",
-                    marca: "Arezzo",
-                    estado: "usado",
-                    observacao: "Pouco usada",
-                    status: "proximo-bazar",
-                    bazarId: 1,
-                    dataCadastro: '2024-03-08'
-                }
-            ];
-
-            // Vendas exemplo
-            const vendasExemplo = [
-                {
-                    id: 1,
-                    itemId: 1,
-                    dataVenda: '2024-03-15',
-                    precoVenda: 80.00,
-                    creditoCliente: 64.00,
-                    comissaoLoja: 16.00,
-                    formaPagamento: "dinheiro",
-                    bazarId: 1
-                },
-                {
-                    id: 2,
-                    itemId: 2,
-                    dataVenda: '2024-03-16',
-                    precoVenda: 45.00,
-                    creditoCliente: 36.00,
-                    comissaoLoja: 9.00,
-                    formaPagamento: "pix",
-                    bazarId: 1
-                }
-            ];
-
-            clientes = clientesExemplo;
-            bazares = bazaresExemplo;
-            itens = itensExemplo;
-            vendas = vendasExemplo;
-            
-            salvarDados();
-            checkInitializers();
-            mostrarNotificacao('Dados de exemplo carregados com sucesso!', 'sucesso');
+            // Outras inicializações específicas da aba
+            if (tabName === 'dashboard') {
+                atualizarDashboard();
+                renderizarCharts();
+                atualizarLembretes();
+                atualizarTopClientes();
+            } else if (tabName === 'clientes') {
+                atualizarListaClientes();
+            } else if (tabName === 'itens') {
+                atualizarListaItens();
+                carregarOpcoesClientes(); // Para formulário de item
+                limparFormularioItem(); // Garante o modo de cadastro
+            } else if (tabName === 'vendas') {
+                carregarItensDisponiveis();
+                atualizarListaVendas();
+            } else if (tabName === 'bazares') {
+                atualizarListaBazares();
+            } else if (tabName === 'relatorios') {
+                abrirRelatorioTab('creditos'); // Abre a primeira sub-aba de relatórios
+            } else if (tabName === 'configuracoes') {
+                carregarConfiguracoes();
+            }
         }
 
-        // ========================================
-        // DASHBOARD E CÁLCULOS
-        // ========================================
+        function abrirRelatorioTab(relatorioTabName) {
+            document.querySelectorAll('.tab-content-internal').forEach(content => {
+                content.style.display = 'none';
+            });
+            document.querySelectorAll('.tab-internal').forEach(button => {
+                button.classList.remove('active');
+            });
 
+            const content = document.getElementById(`relatorio-${relatorioTabName}`);
+            if (content) {
+                content.style.display = 'block';
+                document.querySelector(`.tab-internal[onclick="abrirRelatorioTab('${relatorioTabName}')"]`).classList.add('active');
+            }
+        }
+
+
+        // ========================================
+        // DASHBOARD
+        // ========================================
         function atualizarDashboard() {
-            // Totais gerais
             const totalVendas = vendas.reduce((acc, v) => acc + v.precoVenda, 0);
             const totalCreditos = vendas.reduce((acc, v) => acc + v.creditoCliente, 0);
             const totalComissao = vendas.reduce((acc, v) => acc + v.comissaoLoja, 0);
             const totalItensVendidos = vendas.length;
             const totalItensEstoque = itens.filter(i => i.status === 'disponivel' || i.status === 'proximo-bazar').length;
-
-            // Atualizar valores do dashboard
+            
             document.getElementById('totalVendas').textContent = formatarMoeda(totalVendas);
             document.getElementById('totalCreditos').textContent = formatarMoeda(totalCreditos);
             document.getElementById('totalComissao').textContent = formatarMoeda(totalComissao);
-            document.getElementById('totalItensVendidos').textContent = totalItensVendidos;
-            document.getElementById('totalItensEstoque').textContent = totalItensEstoque;
+            document.getElementById('totalItensVendidos').textContent = totalItensVendidos.toString();
+            document.getElementById('totalItensEstoque').textContent = totalItensEstoque.toString();
 
-            // Atualizar top clientes
-            atualizarTopClientes();
-            
-            // Atualizar listas
-            atualizarListaBazares();
-            atualizarListaItens();
-            atualizarListaClientes();
-            atualizarListaVendas();
-            atualizarLembretes();
-            renderizarCharts();
-            
-            // Atualizar selects
-            atualizarSelectClientes();
-            atualizarSelectItensVenda();
+            // Lógica simples de meta (ex: R$ 500 de vendas)
+            const meta = 500; 
+            const percentualVendas = Math.min(100, (totalVendas / meta) * 100);
+            document.getElementById('progressVendas').style.width = `${percentualVendas}%`;
         }
 
         function atualizarTopClientes() {
             const tbody = document.getElementById('topClientes');
             tbody.innerHTML = '';
-
-            // Calcular totais por cliente
+            
+            // Calcular totais para cada cliente
             const clientesComTotais = clientes.map(cliente => {
                 const vendasCliente = vendas.filter(v => {
                     const item = itens.find(i => i.id === v.itemId);
                     return item && item.clienteId === cliente.id;
                 });
-                
                 const creditosGerados = vendasCliente.reduce((acc, v) => acc + v.creditoCliente, 0);
                 const itensVendidos = vendasCliente.length;
-                
-                return {
-                    ...cliente,
-                    creditosGerados,
-                    itensVendidos
-                };
+                return { ...cliente, creditosGerados, itensVendidos };
             });
 
             // Ordenar por créditos gerados
@@ -1817,11 +1649,46 @@
         // ========================================
         // GESTÃO DE BAZARES
         // ========================================
+        function criarBazar() {
+            const nome = document.getElementById('bazarNome').value;
+            const data = document.getElementById('bazarData').value;
+            const tema = document.getElementById('bazarTema').value;
+            const observacao = document.getElementById('bazarObservacao').value;
+
+            if (!nome || !data) {
+                mostrarNotificacao('Por favor, preencha o nome e a data do bazar.', 'aviso');
+                return;
+            }
+
+            const novoBazar = {
+                id: gerarId(bazares),
+                nome,
+                data,
+                tema,
+                observacao,
+                status: 'ativo',
+                itensCadastrados: 0,
+                itensVendidos: 0,
+                totalVendas: 0
+            };
+
+            bazares.push(novoBazar);
+            salvarDados();
+            limparFormularioBazar();
+            atualizarListaBazares();
+            mostrarNotificacao('Bazar criado com sucesso!', 'sucesso');
+        }
+
+        function limparFormularioBazar() {
+            document.getElementById('bazarNome').value = '';
+            document.getElementById('bazarData').value = '';
+            document.getElementById('bazarTema').value = '';
+            document.getElementById('bazarObservacao').value = '';
+        }
 
         function atualizarListaBazares() {
             const tbody = document.getElementById('listaBazares');
             tbody.innerHTML = '';
-
             bazares.sort((a, b) => new Date(b.data) - new Date(a.data));
 
             if (bazares.length === 0) {
@@ -1842,78 +1709,207 @@
                     <td class="table-actions">
                         <button onclick="verBazar(${bazar.id})" title="Ver Detalhes"><i class="fas fa-eye"></i></button>
                         <button onclick="editarBazar(${bazar.id})" title="Editar"><i class="fas fa-edit"></i></button>
-                        <button onclick="excluirBazar(${bazar.id})" class="delete" title="Excluir"><i class="fas fa-trash"></i></button>
+                        <button class="delete" onclick="excluirBazar(${bazar.id})" title="Excluir"><i class="fas fa-trash"></i></button>
                     </td>
                 `;
             });
         }
 
-        function criarBazar() {
-            const nome = document.getElementById('bazarNome').value.trim();
-            const data = document.getElementById('bazarData').value;
-            const tema = document.getElementById('bazarTema').value.trim();
-            const observacao = document.getElementById('bazarObservacao').value.trim();
-
-            if (!nome || !data) {
-                mostrarNotificacao('Nome e data do bazar são obrigatórios.', 'erro');
-                return;
-            }
-
-            const novoBazar = {
-                id: Date.now(),
-                nome,
-                data,
-                tema,
-                observacao,
-                status: 'ativo',
-                itensCadastrados: 0,
-                itensVendidos: 0,
-                totalVendas: 0,
-                dataCriacao: obterDataHojeISO()
-            };
-
-            bazares.push(novoBazar);
-            salvarDados();
-            atualizarDashboard();
-            limparFormularioBazar();
-            mostrarNotificacao('Bazar criado com sucesso!', 'sucesso');
+        function verBazar(bazarId) {
+            mostrarNotificacao('Funcionalidade de detalhes do bazar em desenvolvimento.', 'info');
         }
 
-        function limparFormularioBazar() {
-            document.getElementById('bazarNome').value = '';
-            document.getElementById('bazarData').value = '';
-            document.getElementById('bazarTema').value = '';
-            document.getElementById('bazarObservacao').value = '';
+        function editarBazar(bazarId) {
+            mostrarNotificacao('Funcionalidade de edição de bazar em desenvolvimento.', 'info');
+        }
+
+        function excluirBazar(bazarId) {
+            if (confirm('Tem certeza que deseja excluir este bazar? Itens e vendas associadas podem ser afetados.')) {
+                bazares = bazares.filter(b => b.id !== bazarId);
+                // Lógica para desvincular itens do bazar
+                itens.forEach(item => {
+                    if (item.bazarId === bazarId) {
+                        item.bazarId = null;
+                        if (item.status === 'proximo-bazar') {
+                            item.status = 'disponivel';
+                        }
+                    }
+                });
+                salvarDados();
+                atualizarDashboard();
+                atualizarListaBazares();
+                mostrarNotificacao('Bazar excluído com sucesso!', 'sucesso');
+            }
         }
 
         // ========================================
         // GESTÃO DE ITENS
         // ========================================
+        function carregarOpcoesClientes() {
+            const selectItem = document.getElementById('itemCliente');
+            // Salva o valor atual para tentar restaurar após recarregar
+            const valorAtual = selectItem.value;
+
+            // Limpa as opções existentes (exceto o placeholder)
+            selectItem.innerHTML = '<option value="">Selecione um cliente</option>'; 
+
+            clientes.forEach(cliente => {
+                const option = document.createElement('option');
+                option.value = cliente.id;
+                option.textContent = cliente.nome;
+                selectItem.appendChild(option);
+            });
+
+            // Restaura o valor, se for um valor válido após a recarga
+            if (valorAtual) {
+                 selectItem.value = valorAtual;
+            }
+        }
+
+        function adicionarItem() {
+            const idEdit = document.getElementById('itemIdEdit').value;
+            const isEdit = idEdit !== '';
+
+            const itemDescricao = document.getElementById('itemDescricao').value;
+            const itemClienteId = parseInt(document.getElementById('itemCliente').value);
+            const itemCategoria = document.getElementById('itemCategoria').value;
+            const itemPreco = parseFloat(document.getElementById('itemPreco').value);
+            const itemTamanho = document.getElementById('itemTamanho').value;
+            const itemMarca = document.getElementById('itemMarca').value;
+            const itemEstado = document.getElementById('itemEstado').value;
+            const itemObservacao = document.getElementById('itemObservacao').value;
+
+            if (!itemDescricao || !itemClienteId || !itemCategoria || itemPreco <= 0) {
+                mostrarNotificacao('Por favor, preencha a descrição, cliente, categoria e preço.', 'aviso');
+                return;
+            }
+
+            if (isEdit) {
+                // Lógica de Edição
+                const itemIndex = itens.findIndex(i => i.id === parseInt(idEdit));
+                if (itemIndex > -1) {
+                    itens[itemIndex] = {
+                        ...itens[itemIndex],
+                        descricao: itemDescricao,
+                        clienteId: itemClienteId,
+                        categoria: itemCategoria,
+                        preco: itemPreco,
+                        tamanho: itemTamanho,
+                        marca: itemMarca,
+                        estado: itemEstado,
+                        observacao: itemObservacao
+                    };
+                    mostrarNotificacao('Item atualizado com sucesso!', 'sucesso');
+                }
+            } else {
+                // Lógica de Cadastro
+                const novoItem = {
+                    id: gerarId(itens),
+                    descricao: itemDescricao,
+                    clienteId: itemClienteId,
+                    categoria: itemCategoria,
+                    preco: itemPreco,
+                    tamanho: itemTamanho,
+                    marca: itemMarca,
+                    estado: itemEstado,
+                    observacao: itemObservacao,
+                    status: 'disponivel',
+                    bazarId: bazares.find(b => b.status === 'ativo')?.id || null,
+                    dataCadastro: obterDataHojeISO()
+                };
+
+                itens.push(novoItem);
+                mostrarNotificacao('Item cadastrado com sucesso!', 'sucesso');
+            }
+
+            salvarDados();
+            limparFormularioItem();
+            atualizarListaItens();
+            atualizarDashboard(); // Se for editar o preço, o dashboard é afetado.
+            renderizarCharts();
+        }
+
+        function limparFormularioItem() {
+            document.getElementById('itemIdEdit').value = '';
+            document.getElementById('itemDescricao').value = '';
+            document.getElementById('itemCliente').value = '';
+            document.getElementById('itemCategoria').value = 'roupa';
+            document.getElementById('itemPreco').value = '';
+            document.getElementById('itemTamanho').value = '';
+            document.getElementById('itemMarca').value = '';
+            document.getElementById('itemEstado').value = 'seminovo';
+            document.getElementById('itemObservacao').value = '';
+
+            // Restaura o botão para o modo de cadastro
+            const actionButtons = document.getElementById('item-action-buttons');
+            actionButtons.innerHTML = `
+                <button onclick="adicionarItem()" class="btn btn-primary" id="btnCadastrarItem">
+                    <i class="fas fa-check-circle"></i> Cadastrar Item
+                </button>
+                <button onclick="limparFormularioItem()" class="btn btn-secondary">
+                    <i class="fas fa-broom"></i> Limpar
+                </button>
+            `;
+        }
+
+        function editarItem(itemId) {
+            const item = itens.find(i => i.id === itemId);
+            if (!item) return;
+
+            // Preenche o formulário com os dados do item
+            document.getElementById('itemIdEdit').value = item.id;
+            document.getElementById('itemDescricao').value = item.descricao;
+            document.getElementById('itemCliente').value = item.clienteId;
+            document.getElementById('itemCategoria').value = item.categoria;
+            document.getElementById('itemPreco').value = item.preco;
+            document.getElementById('itemTamanho').value = item.tamanho;
+            document.getElementById('itemMarca').value = item.marca;
+            document.getElementById('itemEstado').value = item.estado;
+            document.getElementById('itemObservacao').value = item.observacao;
+
+            // Altera o botão de ação para "Salvar Edição"
+            const actionButtons = document.getElementById('item-action-buttons');
+            actionButtons.innerHTML = `
+                <button onclick="adicionarItem()" class="btn btn-warning">
+                    <i class="fas fa-save"></i> Salvar Edição
+                </button>
+                <button onclick="limparFormularioItem()" class="btn btn-secondary">
+                    <i class="fas fa-undo"></i> Cancelar/Novo
+                </button>
+            `;
+            
+            // Rola a tela para o formulário
+            document.getElementById('itens').scrollIntoView({ behavior: 'smooth' });
+            mostrarNotificacao(`Editando item: ${item.descricao}`, 'info');
+        }
+
+        function excluirItem(itemId) {
+            if (confirm('Tem certeza que deseja excluir este item?')) {
+                const item = itens.find(i => i.id === itemId);
+                if (item.status === 'vendido') {
+                    mostrarNotificacao('Não é possível excluir item vendido. Use a função de estorno ou descarte.', 'erro');
+                    return;
+                }
+                itens = itens.filter(i => i.id !== itemId);
+                salvarDados();
+                atualizarListaItens();
+                atualizarDashboard();
+                mostrarNotificacao('Item excluído com sucesso!', 'sucesso');
+            }
+        }
 
         function atualizarListaItens() {
             const container = document.getElementById('lista-itens');
             container.innerHTML = '';
-
-            if (itens.length === 0) {
-                container.innerHTML = `
-                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
-                        <i class="fas fa-tshirt" style="font-size: 3rem; margin-bottom: 15px;"></i>
-                        <p>Nenhum item cadastrado.</p>
-                        <button class="btn btn-primary" onclick="abrirTab('itens')">
-                            <i class="fas fa-plus"></i> Cadastrar Primeiro Item
-                        </button>
-                    </div>
-                `;
-                return;
-            }
+            
+            itens.sort((a, b) => new Date(b.dataCadastro) - new Date(a.dataCadastro)); // Ordena por mais recente
 
             itens.forEach(item => {
                 const cliente = clientes.find(c => c.id === item.clienteId);
                 const bazar = bazares.find(b => b.id === item.bazarId);
-                
+
                 const card = document.createElement('div');
                 card.className = `item-card ${item.status}`;
-                
                 card.innerHTML = `
                     <div class="status">
                         <span class="status-badge ${item.status}">${item.status.replace('-', ' ')}</span>
@@ -1925,7 +1921,7 @@
                     <p><strong>Categoria:</strong> ${item.categoria}</p>
                     <p><strong>Tamanho:</strong> ${item.tamanho || '-'}</p>
                     <div class="action-buttons" style="margin-top: 10px;">
-                        ${item.status === 'disponivel' ? `
+                        ${item.status === 'disponivel' || item.status === 'proximo-bazar' ? `
                             <button class="btn btn-success" onclick="venderItem(${item.id})" style="padding: 5px 10px; font-size: 0.8rem;">
                                 <i class="fas fa-cash-register"></i> Vender
                             </button>
@@ -1938,7 +1934,6 @@
                         </button>
                     </div>
                 `;
-                
                 container.appendChild(card);
             });
         }
@@ -1947,14 +1942,15 @@
             const filtroStatus = document.getElementById('filtroStatusItem').value;
             const filtroCategoria = document.getElementById('filtroCategoria').value;
             const filtroCliente = document.getElementById('filtroClienteItem').value.toLowerCase();
-            
             const cards = document.querySelectorAll('.item-card');
-            
+
             cards.forEach(card => {
                 const status = card.classList.contains(filtroStatus) || !filtroStatus;
-                const categoria = card.querySelector('p:nth-child(5)').textContent.toLowerCase().includes(filtroCategoria) || !filtroCategoria;
-                const cliente = card.querySelector('.cliente').textContent.toLowerCase().includes(filtroCliente) || !filtroCliente;
-                
+                // A busca por categoria e cliente na lista de itens é aproximada pois depende da estrutura HTML
+                const cardText = card.textContent.toLowerCase();
+                const categoria = cardText.includes(`categoria: ${filtroCategoria}`) || !filtroCategoria;
+                const cliente = cardText.includes(filtroCliente) || !filtroCliente;
+
                 if (status && categoria && cliente) {
                     card.style.display = 'block';
                 } else {
@@ -1962,85 +1958,24 @@
                 }
             });
         }
-
-        function adicionarItem() {
-            const descricao = document.getElementById('itemDescricao').value.trim();
-            const clienteId = parseInt(document.getElementById('itemCliente').value);
-            const categoria = document.getElementById('itemCategoria').value;
-            const preco = parseFloat(document.getElementById('itemPreco').value) || 0;
-            const tamanho = document.getElementById('itemTamanho').value.trim();
-            const marca = document.getElementById('itemMarca').value.trim();
-            const estado = document.getElementById('itemEstado').value;
-            const observacao = document.getElementById('itemObservacao').value.trim();
-
-            if (!descricao || !clienteId || !preco) {
-                mostrarNotificacao('Descrição, cliente e preço são obrigatórios.', 'erro');
-                return;
-            }
-
-            // Encontrar bazar ativo
-            const bazarAtivo = bazares.find(b => b.status === 'ativo');
-            if (!bazarAtivo) {
-                mostrarNotificacao('Não há bazar ativo. Crie um bazar primeiro.', 'erro');
-                return;
-            }
-
-            const novoItem = {
-                id: Date.now(),
-                descricao,
-                clienteId,
-                categoria,
-                preco,
-                tamanho,
-                marca,
-                estado,
-                observacao,
-                status: 'disponivel',
-                bazarId: bazarAtivo.id,
-                dataCadastro: obterDataHojeISO()
-            };
-
-            itens.push(novoItem);
-            
-            // Atualizar contador do bazar
-            bazarAtivo.itensCadastrados = (bazarAtivo.itensCadastrados || 0) + 1;
-            
-            salvarDados();
-            atualizarDashboard();
-            limparFormularioItem();
-            mostrarNotificacao('Item cadastrado com sucesso!', 'sucesso');
-        }
-
-        function limparFormularioItem() {
-            document.getElementById('itemDescricao').value = '';
-            document.getElementById('itemCliente').value = '';
-            document.getElementById('itemPreco').value = '';
-            document.getElementById('itemTamanho').value = '';
-            document.getElementById('itemMarca').value = '';
-            document.getElementById('itemObservacao').value = '';
-        }
-
-        function atualizarSelectClientes() {
-            const select = document.getElementById('itemCliente');
-            select.innerHTML = '<option value="">Selecione um cliente</option>';
-            
-            clientes.filter(c => c.status === 'ativo').forEach(cliente => {
-                const option = document.createElement('option');
-                option.value = cliente.id;
-                option.textContent = cliente.nome;
-                select.appendChild(option);
-            });
+        
+        // Função atalho para vender (apenas muda para a tab de vendas e seleciona o item)
+        function venderItem(itemId) {
+            abrirTab('vendas');
+            document.getElementById('vendaItem').value = itemId;
+            carregarDetalhesItem();
         }
 
         // ========================================
-        // SISTEMA DE VENDAS
+        // GESTÃO DE VENDAS
         // ========================================
-
-        function atualizarSelectItensVenda() {
+        function carregarItensDisponiveis() {
             const select = document.getElementById('vendaItem');
-            select.innerHTML = '<option value="">Selecione um item</option>';
+            select.innerHTML = '<option value="">Selecione um item</option>'; 
             
-            itens.filter(i => i.status === 'disponivel').forEach(item => {
+            const itensDisponiveis = itens.filter(i => i.status === 'disponivel' || i.status === 'proximo-bazar');
+
+            itensDisponiveis.forEach(item => {
                 const cliente = clientes.find(c => c.id === item.clienteId);
                 const option = document.createElement('option');
                 option.value = item.id;
@@ -2052,11 +1987,11 @@
         function carregarDetalhesItem() {
             const itemId = parseInt(document.getElementById('vendaItem').value);
             const detalhesDiv = document.getElementById('detalhesItemVenda');
-            const resumoDiv = document.getElementById('resumoVenda');
             
             if (!itemId) {
                 detalhesDiv.style.display = 'none';
-                resumoDiv.style.display = 'none';
+                document.getElementById('resumoVenda').style.display = 'none';
+                document.getElementById('vendaPreco').value = '';
                 return;
             }
 
@@ -2064,7 +1999,7 @@
             if (!item) return;
 
             const cliente = clientes.find(c => c.id === item.clienteId);
-            
+
             // Mostrar detalhes do item
             document.getElementById('infoItemVenda').innerHTML = `
                 <p><strong>Descrição:</strong> ${item.descricao}</p>
@@ -2074,12 +2009,12 @@
                 <p><strong>Estado:</strong> ${item.estado}</p>
             `;
             detalhesDiv.style.display = 'block';
-            
-            // Configurar preço de venda
+
+            // Configurar preço de venda e data
             document.getElementById('vendaPreco').value = item.preco;
             document.getElementById('vendaData').value = obterDataHojeISO();
-            
-            // Calcular e mostrar resumo
+
+            // Calcular e mostrar resumo inicial
             calcularResumoVenda();
         }
 
@@ -2094,7 +2029,7 @@
 
             const creditoCliente = precoVenda * (configuracoes.percentualCliente / 100);
             const comissaoLoja = precoVenda * (configuracoes.percentualLoja / 100);
-            
+
             document.getElementById('detalhesResumoVenda').innerHTML = `
                 <p><strong>Valor da Venda:</strong> ${formatarMoeda(precoVenda)}</p>
                 <p><strong>Crédito para Cliente (${configuracoes.percentualCliente}%):</strong> ${formatarMoeda(creditoCliente)}</p>
@@ -2105,62 +2040,60 @@
 
         function registrarVenda() {
             const itemId = parseInt(document.getElementById('vendaItem').value);
-            const precoVenda = parseFloat(document.getElementById('vendaPreco').value) || 0;
+            const precoVenda = parseFloat(document.getElementById('vendaPreco').value);
             const dataVenda = document.getElementById('vendaData').value;
             const formaPagamento = document.getElementById('vendaFormaPagamento').value;
 
             if (!itemId || !precoVenda || !dataVenda) {
-                mostrarNotificacao('Item, preço e data da venda são obrigatórios.', 'erro');
+                mostrarNotificacao('Preencha todos os campos obrigatórios da venda.', 'aviso');
                 return;
             }
 
             const item = itens.find(i => i.id === itemId);
-            if (!item) {
-                mostrarNotificacao('Item não encontrado.', 'erro');
+            if (!item || (item.status !== 'disponivel' && item.status !== 'proximo-bazar')) {
+                mostrarNotificacao('Item não encontrado ou indisponível para venda.', 'erro');
                 return;
             }
 
-            // Calcular créditos e comissão
             const creditoCliente = precoVenda * (configuracoes.percentualCliente / 100);
             const comissaoLoja = precoVenda * (configuracoes.percentualLoja / 100);
 
-            // Registrar venda
             const novaVenda = {
-                id: Date.now(),
+                id: gerarId(vendas),
                 itemId,
-                dataVenda,
                 precoVenda,
-                creditoCliente,
-                comissaoLoja,
+                dataVenda,
                 formaPagamento,
-                bazarId: item.bazarId
+                creditoCliente,
+                comissaoLoja
             };
 
-            // Atualizar item como vendido
+            // 1. Atualiza o status do item
             item.status = 'vendido';
             
-            // Atualizar créditos do cliente
+            // 2. Atualiza o crédito do cliente
             const cliente = clientes.find(c => c.id === item.clienteId);
             if (cliente) {
                 cliente.creditos = (cliente.creditos || 0) + creditoCliente;
             }
 
-            // Atualizar estatísticas do bazar
+            // 3. Atualiza o bazar (se houver)
             const bazar = bazares.find(b => b.id === item.bazarId);
             if (bazar) {
                 bazar.itensVendidos = (bazar.itensVendidos || 0) + 1;
                 bazar.totalVendas = (bazar.totalVendas || 0) + precoVenda;
             }
 
+            // 4. Adiciona a venda
             vendas.push(novaVenda);
+
             salvarDados();
-            atualizarDashboard();
             limparFormularioVenda();
-            
-            // Mostrar cupom de crédito
-            mostrarCupomCredito(cliente, creditoCliente, item);
-            
-            mostrarNotificacao('Venda registrada com sucesso! Créditos gerados para o cliente.', 'sucesso');
+            atualizarListaVendas();
+            atualizarListaItens();
+            carregarItensDisponiveis(); // Recarrega a lista de itens disponíveis para venda
+            atualizarDashboard();
+            mostrarNotificacao('Venda registrada e crédito atualizado!', 'sucesso');
         }
 
         function limparFormularioVenda() {
@@ -2174,7 +2107,6 @@
         function atualizarListaVendas() {
             const tbody = document.getElementById('listaVendas');
             tbody.innerHTML = '';
-
             vendas.sort((a, b) => new Date(b.dataVenda) - new Date(a.dataVenda));
 
             if (vendas.length === 0) {
@@ -2185,7 +2117,6 @@
             vendas.forEach(venda => {
                 const item = itens.find(i => i.id === venda.itemId);
                 const cliente = item ? clientes.find(c => c.id === item.clienteId) : null;
-                
                 const row = tbody.insertRow();
                 row.innerHTML = `
                     <td>${new Date(venda.dataVenda).toLocaleDateString('pt-BR')}</td>
@@ -2202,14 +2133,163 @@
             });
         }
 
-        function filtrarVendas() {
-            // Implementação similar às outras funções de filtro
-            mostrarNotificacao('Funcionalidade de filtro em desenvolvimento.', 'info');
+        function verDetalhesVenda(vendaId) {
+            const venda = vendas.find(v => v.id === vendaId);
+            if (!venda) {
+                mostrarNotificacao('Venda não encontrada.', 'erro');
+                return;
+            }
+
+            const item = itens.find(i => i.id === venda.itemId);
+            const cliente = item ? clientes.find(c => c.id === item.clienteId) : null;
+            
+            document.getElementById('detalhesModalTitulo').textContent = `Detalhes da Venda #${venda.id}`;
+            document.getElementById('detalhesModalConteudo').innerHTML = `
+                <h4><i class="fas fa-receipt"></i> Informações da Transação</h4>
+                <p><strong>Data da Venda:</strong> ${new Date(venda.dataVenda).toLocaleDateString('pt-BR')}</p>
+                <p><strong>Forma de Pagamento:</strong> ${venda.formaPagamento.toUpperCase()}</p>
+                <hr>
+                <h4><i class="fas fa-tshirt"></i> Item Vendido</h4>
+                <p><strong>Descrição:</strong> ${item ? item.descricao : 'N/A'}</p>
+                <p><strong>Preço Original:</strong> ${item ? formatarMoeda(item.preco) : 'N/A'}</p>
+                <hr>
+                <h4><i class="fas fa-users"></i> Cliente Dono</h4>
+                <p><strong>Nome:</strong> ${cliente ? cliente.nome : 'N/A'}</p>
+                <p><strong>Telefone:</strong> ${cliente ? cliente.telefone : 'N/A'}</p>
+                <hr>
+                <h4><i class="fas fa-money-check-alt"></i> Valores</h4>
+                <p><strong>Valor Final da Venda:</strong> <span class="value" style="color: var(--success);">${formatarMoeda(venda.precoVenda)}</span></p>
+                <p><strong>Crédito para Cliente:</strong> ${formatarMoeda(venda.creditoCliente)}</p>
+                <p><strong>Comissão da Loja:</strong> ${formatarMoeda(venda.comissaoLoja)}</p>
+                <p><strong>Novo Saldo do Cliente:</strong> ${cliente ? formatarMoeda(cliente.creditos) : 'N/A'}</p>
+            `;
+
+            abrirModal('detalhesModal');
         }
+
+        function filtrarVendas() {
+            // Implementação de filtro de vendas aqui
+            mostrarNotificacao('Funcionalidade de filtro de vendas em desenvolvimento.', 'info');
+            atualizarListaVendas(); // Apenas para recarregar a lista base
+        }
+
 
         // ========================================
         // GESTÃO DE CLIENTES
         // ========================================
+        function adicionarCliente() {
+            const idEdit = document.getElementById('clienteIdEdit').value;
+            const isEdit = idEdit !== '';
+            
+            const nome = document.getElementById('clienteNome').value;
+            const telefone = document.getElementById('clienteTelefone').value;
+            const cpf = document.getElementById('clienteCpf').value;
+            const email = document.getElementById('clienteEmail').value;
+            const observacao = document.getElementById('clienteObservacao').value;
+
+            if (!nome || !telefone) {
+                mostrarNotificacao('Nome e Telefone são obrigatórios.', 'aviso');
+                return;
+            }
+
+            if (isEdit) {
+                // Lógica de Edição
+                const clienteIndex = clientes.findIndex(c => c.id === parseInt(idEdit));
+                if (clienteIndex > -1) {
+                    clientes[clienteIndex] = {
+                        ...clientes[clienteIndex],
+                        nome,
+                        telefone,
+                        cpf,
+                        email,
+                        observacao
+                    };
+                    mostrarNotificacao('Cliente atualizado com sucesso!', 'sucesso');
+                }
+            } else {
+                // Lógica de Cadastro
+                const novoCliente = {
+                    id: gerarId(clientes),
+                    nome,
+                    telefone,
+                    cpf,
+                    email,
+                    observacao,
+                    status: 'ativo',
+                    creditos: 0
+                };
+                clientes.push(novoCliente);
+                mostrarNotificacao('Cliente cadastrado com sucesso!', 'sucesso');
+            }
+
+            salvarDados();
+            limparFormularioCliente();
+            atualizarListaClientes();
+            carregarOpcoesClientes(); // Para atualizar a lista de clientes em outras tabs
+        }
+        
+        function limparFormularioCliente() {
+            document.getElementById('clienteIdEdit').value = '';
+            document.getElementById('clienteNome').value = '';
+            document.getElementById('clienteTelefone').value = '';
+            document.getElementById('clienteCpf').value = '';
+            document.getElementById('clienteEmail').value = '';
+            document.getElementById('clienteObservacao').value = '';
+
+             // Restaura o botão para o modo de cadastro
+            const actionButtons = document.getElementById('cliente-action-buttons');
+            actionButtons.innerHTML = `
+                <button onclick="adicionarCliente()" class="btn btn-primary" id="btnCadastrarCliente">
+                    <i class="fas fa-check-circle"></i> Cadastrar Cliente
+                </button>
+                <button onclick="limparFormularioCliente()" class="btn btn-secondary">
+                    <i class="fas fa-broom"></i> Limpar
+                </button>
+            `;
+        }
+
+
+        function editarCliente(clienteId) {
+            const cliente = clientes.find(c => c.id === clienteId);
+            if (!cliente) return;
+
+            // Preenche o formulário com os dados do cliente
+            document.getElementById('clienteIdEdit').value = cliente.id;
+            document.getElementById('clienteNome').value = cliente.nome;
+            document.getElementById('clienteTelefone').value = cliente.telefone;
+            document.getElementById('clienteCpf').value = cliente.cpf;
+            document.getElementById('clienteEmail').value = cliente.email;
+            document.getElementById('clienteObservacao').value = cliente.observacao;
+
+            // Altera o botão de ação para "Salvar Edição"
+            const actionButtons = document.getElementById('cliente-action-buttons');
+            actionButtons.innerHTML = `
+                <button onclick="adicionarCliente()" class="btn btn-warning">
+                    <i class="fas fa-save"></i> Salvar Edição
+                </button>
+                <button onclick="limparFormularioCliente()" class="btn btn-secondary">
+                    <i class="fas fa-undo"></i> Cancelar/Novo
+                </button>
+            `;
+            
+            // Rola a tela para o formulário
+            document.getElementById('clientes').scrollIntoView({ behavior: 'smooth' });
+            mostrarNotificacao(`Editando cliente: ${cliente.nome}`, 'info');
+        }
+
+        function excluirCliente(clienteId) {
+            if (confirm('Tem certeza que deseja excluir este cliente? Isso não exclui os itens e vendas associadas.')) {
+                // Remove o cliente
+                clientes = clientes.filter(c => c.id !== clienteId);
+                // Define os itens do cliente como sem cliente (para não quebrar)
+                itens.filter(i => i.clienteId === clienteId).forEach(i => i.clienteId = null);
+                
+                salvarDados();
+                atualizarListaClientes();
+                atualizarDashboard();
+                mostrarNotificacao('Cliente excluído com sucesso!', 'sucesso');
+            }
+        }
 
         function atualizarListaClientes() {
             const tbody = document.getElementById('listaClientes');
@@ -2223,13 +2303,13 @@
             clientes.forEach(cliente => {
                 // Calcular estatísticas do cliente
                 const itensCliente = itens.filter(i => i.clienteId === cliente.id);
-                const itensVendidos = itensCliente.filter(i => i.status === 'vendido').length;
                 const vendasCliente = vendas.filter(v => {
                     const item = itens.find(i => i.id === v.itemId);
                     return item && item.clienteId === cliente.id;
                 });
+                const itensVendidos = vendasCliente.length;
                 const creditosGerados = vendasCliente.reduce((acc, v) => acc + v.creditoCliente, 0);
-                
+
                 const row = tbody.insertRow();
                 row.innerHTML = `
                     <td>${cliente.nome}</td>
@@ -2242,73 +2322,36 @@
                     <td class="table-actions">
                         <button onclick="verDetalhesCliente(${cliente.id})" title="Ver Detalhes"><i class="fas fa-eye"></i></button>
                         <button onclick="editarCliente(${cliente.id})" title="Editar"><i class="fas fa-edit"></i></button>
-                        <button onclick="excluirCliente(${cliente.id})" class="delete" title="Excluir"><i class="fas fa-trash"></i></button>
+                        <button class="delete" onclick="excluirCliente(${cliente.id})" title="Excluir"><i class="fas fa-trash"></i></button>
                     </td>
                 `;
             });
         }
 
         function filtrarClientes() {
-            // Implementação similar às outras funções de filtro
-            mostrarNotificacao('Funcionalidade de filtro em desenvolvimento.', 'info');
-        }
-
-        function adicionarCliente() {
-            const nome = document.getElementById('clienteNome').value.trim();
-            const telefone = document.getElementById('clienteTelefone').value.trim();
-            const cpf = document.getElementById('clienteCPF').value.trim();
-            const email = document.getElementById('clienteEmail').value.trim();
-            const observacao = document.getElementById('clienteObservacao').value.trim();
-
-            if (!nome || !telefone) {
-                mostrarNotificacao('Nome e telefone são obrigatórios.', 'erro');
-                return;
-            }
-
-            const novoCliente = {
-                id: Date.now(),
-                nome,
-                telefone,
-                cpf,
-                email,
-                observacao,
-                creditos: 0,
-                status: 'ativo',
-                dataCadastro: obterDataHojeISO()
-            };
-
-            clientes.push(novoCliente);
-            salvarDados();
-            atualizarDashboard();
-            limparFormularioCliente();
-            mostrarNotificacao('Cliente cadastrado com sucesso!', 'sucesso');
-        }
-
-        function limparFormularioCliente() {
-            document.getElementById('clienteNome').value = '';
-            document.getElementById('clienteTelefone').value = '';
-            document.getElementById('clienteCPF').value = '';
-            document.getElementById('clienteEmail').value = '';
-            document.getElementById('clienteObservacao').value = '';
+            mostrarNotificacao('Funcionalidade de filtro de clientes em desenvolvimento.', 'info');
+            // Implementação de filtro de clientes aqui
+            atualizarListaClientes(); // Apenas para recarregar a lista base
         }
 
         function verDetalhesCliente(clienteId) {
             const cliente = clientes.find(c => c.id === clienteId);
             if (!cliente) return;
-
+            
             const itensCliente = itens.filter(i => i.clienteId === clienteId);
             const vendasCliente = vendas.filter(v => {
                 const item = itens.find(i => i.id === v.itemId);
                 return item && item.clienteId === clienteId;
             });
 
-            const detalhes = document.getElementById('detalhesClienteConteudo');
-            detalhes.innerHTML = `
+            document.getElementById('detalhesClienteTitulo').textContent = `Detalhes de ${cliente.nome}`;
+
+            document.getElementById('detalhesClienteConteudo').innerHTML = `
                 <h3>${cliente.nome}</h3>
                 <p><strong>Telefone:</strong> ${cliente.telefone}</p>
                 <p><strong>CPF:</strong> ${cliente.cpf || 'Não informado'}</p>
                 <p><strong>E-mail:</strong> ${cliente.email || 'Não informado'}</p>
-                <p><strong>Saldo de Créditos:</strong> ${formatarMoeda(cliente.creditos || 0)}</p>
+                <p><strong>Saldo de Créditos:</strong> <span class="credito-badge">${formatarMoeda(cliente.creditos || 0)}</span></p>
                 <p><strong>Status:</strong> <span class="status-badge ${cliente.status}">${cliente.status}</span></p>
                 <hr>
                 <h4>Estatísticas</h4>
@@ -2325,84 +2368,52 @@
                     }).join('')}
                 </ul>
             `;
-
-            document.getElementById('modalCliente').classList.add('active');
-        }
-
-        function fecharModalCliente() {
-            document.getElementById('modalCliente').classList.remove('active');
+            abrirModal('detalhesClienteModal');
         }
 
         // ========================================
-        // CUPOM DE CRÉDITO
+        // GESTÃO DE CONFIGURAÇÕES
         // ========================================
-
-        function mostrarCupomCredito(cliente, valorCredito, item) {
-            const conteudo = document.getElementById('conteudoCupom');
-            conteudo.innerHTML = `
-                <div style="border: 2px dashed #8b5cf6; padding: 20px; border-radius: 10px; background: white; color: #333;">
-                    <h2 style="color: #8b5cf6; margin-bottom: 10px;">CUPOM DE CRÉDITO</h2>
-                    <p><strong>Loja:</strong> BazarPlus</p>
-                    <p><strong>Cliente:</strong> ${cliente.nome}</p>
-                    <p><strong>Item Vendido:</strong> ${item.descricao}</p>
-                    <p><strong>Valor do Crédito:</strong> ${formatarMoeda(valorCredito)}</p>
-                    <p><strong>Data:</strong> ${new Date().toLocaleDateString('pt-BR')}</p>
-                    <p style="margin-top: 15px; font-size: 0.9em; color: #666;">
-                        Este crédito pode ser utilizado para compras na loja.<br>
-                        Validade: ${new Date(new Date().setMonth(new Date().getMonth() + configuracoes.validadeCredito)).toLocaleDateString('pt-BR')}
-                    </p>
-                    <div style="margin-top: 15px; padding: 10px; background: #f0f0f0; border-radius: 5px;">
-                        <strong>Código:</strong> C${cliente.id}-${Date.now().toString().slice(-6)}
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('modalCupom').classList.add('active');
+        function carregarConfiguracoes() {
+            document.getElementById('percentualCliente').value = configuracoes.percentualCliente;
+            document.getElementById('percentualLoja').value = configuracoes.percentualLoja;
+            document.getElementById('validadeCredito').value = configuracoes.validadeCredito;
+            document.getElementById('alertaEstoque').value = configuracoes.alertaEstoque;
         }
 
-        function fecharModalCupom() {
-            document.getElementById('modalCupom').classList.remove('active');
-        }
+        function salvarConfiguracoes() {
+            const percentualCliente = parseFloat(document.getElementById('percentualCliente').value);
+            const percentualLoja = parseFloat(document.getElementById('percentualLoja').value);
+            const validadeCredito = parseInt(document.getElementById('validadeCredito').value);
+            const alertaEstoque = parseInt(document.getElementById('alertaEstoque').value);
 
-        function imprimirCupom() {
-            window.print();
+            if (percentualCliente + percentualLoja !== 100) {
+                mostrarNotificacao('A soma dos percentuais do Cliente e da Loja deve ser 100%.', 'erro');
+                return;
+            }
+
+            configuracoes.percentualCliente = percentualCliente;
+            configuracoes.percentualLoja = percentualLoja;
+            configuracoes.validadeCredito = validadeCredito;
+            configuracoes.alertaEstoque = alertaEstoque;
+
+            salvarDados();
+            // Re-renderiza o dashboard e gráficos, pois as regras de negócio mudaram
+            atualizarDashboard();
+            renderizarCharts();
+            mostrarNotificacao('Configurações salvas com sucesso!', 'sucesso');
         }
 
         // ========================================
-        // RELATÓRIOS
+        // GESTÃO DE RELATÓRIOS (PDF)
         // ========================================
-
-        function abrirRelatorioTab(tabName) {
-            // Esconder todas as abas
-            document.querySelectorAll('.relatorio-tab').forEach(tab => {
-                tab.style.display = 'none';
-            });
-            
-            // Remover classe active de todas as abas
-            document.querySelectorAll('.tab-internal').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Mostrar aba selecionada
-            document.getElementById(`relatorio-${tabName}`).style.display = 'block';
-            
-            // Adicionar classe active à aba selecionada
-            document.querySelector(`.tab-internal[onclick="abrirRelatorioTab('${tabName}')"]`).classList.add('active');
-        }
 
         function gerarRelatorioCreditosPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'mm', 'a4');
-            
-            doc.setFontSize(18);
-            doc.text('Relatório de Créditos - BazarPlus', 105, 15, { align: 'center' });
-            
-            doc.setFontSize(12);
-            doc.text(`Data do Relatório: ${new Date().toLocaleDateString('pt-BR')}`, 105, 25, { align: 'center' });
-            
-            // Tabela de créditos por cliente
-            const headers = [['Cliente', 'Telefone', 'Créditos Gerados', 'Saldo Atual', 'Itens Vendidos']];
-            
+            const doc = new jsPDF('p', 'pt', 'a4');
+            const titulo = "Relatório de Créditos de Clientes";
+            const headers = [["Cliente", "Telefone", "Créditos Gerados", "Saldo Atual", "Itens Vendidos"]];
+
+            // Preparação dos dados
             const body = clientes.map(cliente => {
                 const vendasCliente = vendas.filter(v => {
                     const item = itens.find(i => i.id === v.itemId);
@@ -2410,7 +2421,6 @@
                 });
                 const creditosGerados = vendasCliente.reduce((acc, v) => acc + v.creditoCliente, 0);
                 const itensVendidos = vendasCliente.length;
-                
                 return [
                     cliente.nome,
                     cliente.telefone,
@@ -2419,515 +2429,59 @@
                     itensVendidos.toString()
                 ];
             });
+
+            // Configuração e geração do AutoTable
+            doc.setFontSize(16);
+            doc.text(titulo, 40, 30);
             
             doc.autoTable({
-                startY: 35,
+                startY: 40,
                 head: headers,
                 body: body,
                 styles: { fontSize: 10, cellPadding: 3 },
                 headStyles: { fillColor: [139, 92, 246] }
             });
-            
+
             doc.save('Relatorio_Creditos_BazarPlus.pdf');
             mostrarNotificacao('Relatório de créditos gerado com sucesso!', 'sucesso');
         }
 
-        function gerarRankingCreditos() {
-            // Implementação similar ao topClientes no dashboard
-            mostrarNotificacao('Ranking de créditos exibido no dashboard.', 'info');
-        }
-
-        // ========================================
-        // GRÁFICOS (CHARTS)
-        // ========================================
-
-        function renderizarCharts() {
-            // 1. Vendas e Créditos Mensais
-            const dadosMensais = vendas.reduce((acc, v) => {
-                const mesAno = v.dataVenda.substring(0, 7);
-                
-                if (!acc[mesAno]) {
-                    acc[mesAno] = { vendas: 0, creditos: 0 };
-                }
-                acc[mesAno].vendas += v.precoVenda;
-                acc[mesAno].creditos += v.creditoCliente;
-                return acc;
-            }, {});
-
-            const labels = Object.keys(dadosMensais).sort();
-            const vendasData = labels.map(l => dadosMensais[l].vendas);
-            const creditosData = labels.map(l => dadosMensais[l].creditos);
-
-            if (vendasCreditosChartInstance) {
-                vendasCreditosChartInstance.destroy();
-            }
-
-            const ctx1 = document.getElementById('vendasCreditosChart').getContext('2d');
-            vendasCreditosChartInstance = new Chart(ctx1, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Vendas (R$)',
-                            data: vendasData,
-                            backgroundColor: 'rgba(139, 92, 246, 0.7)',
-                            borderColor: 'rgba(139, 92, 246, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Créditos Gerados (R$)',
-                            data: creditosData,
-                            backgroundColor: 'rgba(16, 185, 129, 0.7)',
-                            borderColor: 'rgba(16, 185, 129, 1)',
-                            borderWidth: 1
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Vendas e Créditos por Mês'
-                        }
-                    }
-                }
-            });
-
-            // 2. Status dos Itens (Gráfico de Pizza)
-            const dadosStatusItens = itens.reduce((acc, i) => {
-                acc[i.status] = (acc[i.status] || 0) + 1;
-                return acc;
-            }, {});
-
-            if (statusItensChartInstance) {
-                statusItensChartInstance.destroy();
-            }
-
-            const ctx2 = document.getElementById('statusItensChart').getContext('2d');
-            statusItensChartInstance = new Chart(ctx2, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Disponível', 'Vendido', 'Próximo Bazar', 'Devolvido'],
-                    datasets: [{
-                        data: [
-                            dadosStatusItens['disponivel'] || 0,
-                            dadosStatusItens['vendido'] || 0,
-                            dadosStatusItens['proximo-bazar'] || 0,
-                            dadosStatusItens['devolvido'] || 0
-                        ],
-                        backgroundColor: [
-                            'rgba(16, 185, 129, 0.8)',
-                            'rgba(59, 130, 246, 0.8)',
-                            'rgba(245, 158, 11, 0.8)',
-                            'rgba(239, 68, 68, 0.8)'
-                        ],
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Distribuição dos Itens'
-                        }
-                    }
-                }
-            });
-        }
-
-        // ========================================
-        // LEMBRETES E ALERTAS
-        // ========================================
-
-        function atualizarLembretes() {
-            const container = document.getElementById('lista-lembretes');
-            container.innerHTML = '';
-            
-            const lembretes = [];
-            
-            // Verificar itens com muitos bazares sem vender
-            const itensProblema = itens.filter(i => {
-                // Lógica para identificar itens problemáticos
-                return i.status === 'proximo-bazar';
-            });
-            
-            if (itensProblema.length > 0) {
-                lembretes.push({
-                    tipo: 'itens',
-                    titulo: 'Itens para Próximo Bazar',
-                    descricao: `${itensProblema.length} item(s) aguardando próximo bazar.`,
-                    prioridade: 'media'
-                });
-            }
-            
-            // Verificar clientes com crédito alto
-            const clientesCreditoAlto = clientes.filter(c => (c.creditos || 0) > 100);
-            if (clientesCreditoAlto.length > 0) {
-                lembretes.push({
-                    tipo: 'creditos',
-                    titulo: 'Clientes com Crédito Disponível',
-                    descricao: `${clientesCreditoAlto.length} cliente(s) com crédito para usar na loja.`,
-                    prioridade: 'baixa'
-                });
-            }
-            
-            // Verificar bazar ativo
-            const bazarAtivo = bazares.find(b => b.status === 'ativo');
-            if (!bazarAtivo) {
-                lembretes.push({
-                    tipo: 'bazar',
-                    titulo: 'Sem Bazar Ativo',
-                    descricao: 'Nenhum bazar está ativo no momento.',
-                    prioridade: 'alta'
-                });
-            }
-
-            if (lembretes.length === 0) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 20px; color: var(--text-muted);">
-                        <i class="fas fa-check-circle" style="font-size: 2rem; margin-bottom: 10px;"></i>
-                        <p>Nenhum lembrete ou alerta no momento.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            lembretes.forEach(lembrete => {
-                const item = document.createElement('div');
-                item.className = 'lembrete-item';
-                
-                const icones = {
-                    'itens': 'fa-tshirt',
-                    'creditos': 'fa-coins',
-                    'bazar': 'fa-calendar-alt'
-                };
-                
-                const cores = {
-                    'alta': 'var(--danger)',
-                    'media': 'var(--warning)',
-                    'baixa': 'var(--info)'
-                };
-                
-                item.style.borderLeftColor = cores[lembrete.prioridade];
-                
-                item.innerHTML = `
-                    <div class="info">
-                        <h4><i class="fas ${icones[lembrete.tipo]}"></i> ${lembrete.titulo}</h4>
-                        <p>${lembrete.descricao}</p>
-                    </div>
-                    <div class="acoes">
-                        <button class="btn btn-primary" onclick="verDetalhesLembrete('${lembrete.tipo}')" style="padding: 5px 10px;">
-                            <i class="fas fa-eye"></i> Ver
-                        </button>
-                    </div>
-                `;
-                
-                container.appendChild(item);
-            });
-        }
-        
-        function verDetalhesLembrete(tipo) {
-            switch(tipo) {
-                case 'itens':
-                    document.getElementById('filtroStatusItem').value = 'proximo-bazar';
-                    filtrarItens();
-                    abrirTab('itens');
-                    break;
-                case 'creditos':
-                    abrirTab('clientes');
-                    break;
-                case 'bazar':
-                    abrirTab('bazares');
-                    break;
-            }
-        }
-
-        // ========================================
-        // CONFIGURAÇÕES E BACKUP
-        // ========================================
-
-        function salvarConfiguracoes() {
-            const percentualCliente = parseFloat(document.getElementById('percentualCliente').value) || 0;
-            const percentualLoja = parseFloat(document.getElementById('percentualLoja').value) || 0;
-            const validadeCredito = parseInt(document.getElementById('validadeCredito').value) || 0;
-            const alertaEstoque = parseInt(document.getElementById('alertaEstoque').value) || 0;
-            
-            configuracoes.percentualCliente = percentualCliente;
-            configuracoes.percentualLoja = percentualLoja;
-            configuracoes.validadeCredito = validadeCredito;
-            configuracoes.alertaEstoque = alertaEstoque;
-            
-            salvarDados();
-            mostrarNotificacao('Configurações salvas com sucesso!', 'sucesso');
-        }
-        
-        function carregarConfiguracoes() {
-            document.getElementById('percentualCliente').value = configuracoes.percentualCliente;
-            document.getElementById('percentualLoja').value = configuracoes.percentualLoja;
-            document.getElementById('validadeCredito').value = configuracoes.validadeCredito;
-            document.getElementById('alertaEstoque').value = configuracoes.alertaEstoque;
-            
-            // Aplicar tema salvo
-            if (configuracoes.tema === 'dark') {
-                document.body.setAttribute('data-theme', 'dark');
-                document.querySelector('.theme-toggle i').className = 'fas fa-sun';
-            }
-        }
-        
-        function exportarDados() {
-            const dadosCompletos = {
-                bazares: bazares,
-                itens: itens,
-                clientes: clientes,
-                vendas: vendas,
-                configuracoes: configuracoes,
-                dataExportacao: new Date().toISOString()
-            };
-            
-            const dadosJSON = JSON.stringify(dadosCompletos, null, 2);
-            const blob = new Blob([dadosJSON], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `backup_bazarplus_${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            mostrarNotificacao('Dados exportados com sucesso!', 'sucesso');
-        }
-        
-        function importarDados() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            
-            input.onchange = e => {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                
-                reader.onload = event => {
-                    try {
-                        const dados = JSON.parse(event.target.result);
-                        
-                        if (confirm('Isso substituirá todos os dados atuais. Continuar?')) {
-                            bazares = dados.bazares || [];
-                            itens = dados.itens || [];
-                            clientes = dados.clientes || [];
-                            vendas = dados.vendas || [];
-                            configuracoes = { ...configuracoes, ...dados.configuracoes };
-                            
-                            salvarDados();
-                            checkInitializers();
-                            mostrarNotificacao('Dados importados com sucesso!', 'sucesso');
-                        }
-                    } catch (error) {
-                        mostrarNotificacao('Erro ao importar dados. Arquivo inválido.', 'erro');
-                    }
-                };
-                
-                reader.readAsText(file);
-            };
-            
-            input.click();
-        }
-        
-        function criarBackupAutomatico() {
-            localStorage.setItem('bazarPlus_backup', JSON.stringify({
-                bazares: bazares,
-                itens: itens,
-                clientes: clientes,
-                vendas: vendas,
-                configuracoes: configuracoes,
-                dataBackup: new Date().toISOString()
-            }));
-            
-            document.getElementById('ultimoBackup').textContent = new Date().toLocaleString('pt-BR');
-            mostrarNotificacao('Backup automático criado com sucesso!', 'sucesso');
-        }
-
-        // ========================================
-        // NAVEGAÇÃO E INICIALIZAÇÃO
-        // ========================================
-
-        function abrirTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-
-            document.getElementById(tabName).classList.add('active');
-            document.querySelector(`.nav-item[onclick="abrirTab('${tabName}')"]`).classList.add('active');
-            
-            // Ações específicas ao abrir cada tab
-            if (tabName === 'itens') {
-                document.getElementById('vendaData').value = obterDataHojeISO();
-                atualizarSelectClientes();
-            } else if (tabName === 'dashboard') {
-                atualizarDashboard();
-            } else if (tabName === 'vendas') {
-                atualizarSelectItensVenda();
-                document.getElementById('vendaData').value = obterDataHojeISO();
-            } else if (tabName === 'configuracoes') {
-                carregarConfiguracoes();
-            }
-        }
-
-        function checkInitializers() {
-            carregarDados();
-            atualizarDashboard();
-            carregarConfiguracoes();
-
-            // Se for o primeiro acesso, cria dados de exemplo
-            if (bazares.length === 0 && localStorage.getItem('bazarPlus_bazares') === null) {
-                // Não criar automaticamente, deixar usuário escolher
-            }
-            
-            // Verificar último backup
-            const backup = localStorage.getItem('bazarPlus_backup');
-            if (backup) {
-                const dados = JSON.parse(backup);
-                document.getElementById('ultimoBackup').textContent = new Date(dados.dataBackup).toLocaleString('pt-BR');
-            }
-            
-            // Configura data mínima para os date inputs
-            const today = new Date().toISOString().split('T')[0];
-            document.querySelectorAll('input[type="date"]').forEach(input => {
-                input.max = today;
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            checkInitializers();
-            
-            // Event listeners para cálculos em tempo real
-            document.getElementById('vendaPreco').addEventListener('input', calcularResumoVenda);
-            document.getElementById('percentualCliente').addEventListener('input', function() {
-                const percentualCliente = parseFloat(this.value) || 0;
-                document.getElementById('percentualLoja').value = 100 - percentualCliente;
-            });
-            document.getElementById('percentualLoja').addEventListener('input', function() {
-                const percentualLoja = parseFloat(this.value) || 0;
-                document.getElementById('percentualCliente').value = 100 - percentualLoja;
-            });
-            
-            // Atalhos de teclado
-            document.addEventListener('keydown', function(e) {
-                // Ctrl+S para salvar
-                if (e.ctrlKey && e.key === 's') {
-                    e.preventDefault();
-                    const tabAtiva = document.querySelector('.tab-content.active').id;
-                    
-                    if (tabAtiva === 'itens') {
-                        adicionarItem();
-                    } else if (tabAtiva === 'clientes') {
-                        adicionarCliente();
-                    } else if (tabAtiva === 'bazares') {
-                        criarBazar();
-                    }
-                }
-                
-                // Ctrl+E para exportar
-                if (e.ctrlKey && e.key === 'e') {
-                    e.preventDefault();
-                    exportarDados();
-                }
-            });
-        });
-
-        // ========================================
-        // FUNÇÕES A IMPLEMENTAR (placeholders)
-        // ========================================
-
-        function venderItem(itemId) {
-            document.getElementById('vendaItem').value = itemId;
-            carregarDetalhesItem();
-            abrirTab('vendas');
-        }
-
-        function editarItem(itemId) {
-            mostrarNotificacao('Funcionalidade de edição de item em desenvolvimento.', 'info');
-        }
-
-        function excluirItem(itemId) {
-            if (confirm('Tem certeza que deseja excluir este item?')) {
-                itens = itens.filter(i => i.id !== itemId);
-                salvarDados();
-                atualizarDashboard();
-                mostrarNotificacao('Item excluído com sucesso!', 'sucesso');
-            }
-        }
-
-        function editarCliente(clienteId) {
-            mostrarNotificacao('Funcionalidade de edição de cliente em desenvolvimento.', 'info');
-        }
-
-        function excluirCliente(clienteId) {
-            if (confirm('Tem certeza que deseja excluir este cliente?')) {
-                // Verificar se o cliente tem itens ou vendas
-                const itensCliente = itens.filter(i => i.clienteId === clienteId);
-                if (itensCliente.length > 0) {
-                    mostrarNotificacao('Não é possível excluir cliente com itens cadastrados.', 'erro');
-                    return;
-                }
-                
-                clientes = clientes.filter(c => c.id !== clienteId);
-                salvarDados();
-                atualizarDashboard();
-                mostrarNotificacao('Cliente excluído com sucesso!', 'sucesso');
-            }
-        }
-
-        function verBazar(bazarId) {
-            mostrarNotificacao('Funcionalidade de visualização de bazar em desenvolvimento.', 'info');
-        }
-
-        function editarBazar(bazarId) {
-            mostrarNotificacao('Funcionalidade de edição de bazar em desenvolvimento.', 'info');
-        }
-
-        function excluirBazar(bazarId) {
-            if (confirm('Tem certeza que deseja excluir este bazar?')) {
-                // Verificar se o bazar tem itens
-                const itensBazar = itens.filter(i => i.bazarId === bazarId);
-                if (itensBazar.length > 0) {
-                    mostrarNotificacao('Não é possível excluir bazar com itens cadastrados.', 'erro');
-                    return;
-                }
-                
-                bazares = bazares.filter(b => b.id !== bazarId);
-                salvarDados();
-                atualizarDashboard();
-                mostrarNotificacao('Bazar excluído com sucesso!', 'sucesso');
-            }
-        }
-
-        function verDetalhesVenda(vendaId) {
-            mostrarNotificacao('Funcionalidade de visualização de venda em desenvolvimento.', 'info');
-        }
-
-        // Funções de relatório placeholder
         function gerarRelatorioVendasPDF() {
-            mostrarNotificacao('Relatório de vendas em desenvolvimento.', 'info');
+            const doc = new jsPDF('p', 'pt', 'a4');
+            const titulo = "Relatório de Vendas Detalhadas";
+            const headers = [["Data", "Item", "Cliente", "Valor Venda", "Crédito Cliente", "Comissão Loja", "Pagamento"]];
+
+            // Preparação dos dados
+            const body = vendas.map(venda => {
+                const item = itens.find(i => i.id === venda.itemId);
+                const cliente = item ? clientes.find(c => c.id === item.clienteId) : { nome: 'N/A' };
+                return [
+                    new Date(venda.dataVenda).toLocaleDateString('pt-BR'),
+                    item ? item.descricao : 'Item não encontrado',
+                    cliente.nome,
+                    formatarMoeda(venda.precoVenda),
+                    formatarMoeda(venda.creditoCliente),
+                    formatarMoeda(venda.comissaoLoja),
+                    venda.formaPagamento.charAt(0).toUpperCase() + venda.formaPagamento.slice(1) // Capitaliza
+                ];
+            });
+
+            // Configuração e geração do AutoTable
+            doc.setFontSize(16);
+            doc.text(titulo, 40, 30);
+            
+            doc.autoTable({
+                startY: 40,
+                head: headers,
+                body: body,
+                styles: { fontSize: 10, cellPadding: 3 },
+                headStyles: { fillColor: [16, 185, 129] } // Cor verde (success)
+            });
+
+            doc.save('Relatorio_Vendas_BazarPlus.pdf');
+            mostrarNotificacao('Relatório de vendas gerado com sucesso!', 'sucesso');
         }
+
 
         function gerarRelatorioClientesPDF() {
             mostrarNotificacao('Relatório de clientes em desenvolvimento.', 'info');
@@ -2941,20 +2495,329 @@
             mostrarNotificacao('Relatório de bazares em desenvolvimento.', 'info');
         }
 
-        function gerarTopClientes() {
-            mostrarNotificacao('Top clientes exibido no dashboard.', 'info');
+        function gerarRankingCreditos() {
+            document.getElementById('dashboard').scrollIntoView({ behavior: 'smooth' });
+            mostrarNotificacao('Ranking de créditos exibido no dashboard (Top Clientes).', 'info');
+            abrirTab('dashboard');
         }
 
         function gerarItensNaoVendidos() {
             document.getElementById('filtroStatusItem').value = 'proximo-bazar';
             filtrarItens();
             abrirTab('itens');
+            mostrarNotificacao('Filtro aplicado na aba Itens: Próximo Bazar', 'info');
         }
 
         function compararBazares() {
             mostrarNotificacao('Comparação de bazares em desenvolvimento.', 'info');
         }
 
+        // ========================================
+        // GRÁFICOS (CHARTS)
+        // ========================================
+        function renderizarCharts() {
+            // 1. Vendas e Créditos Mensais
+            const dadosMensais = vendas.reduce((acc, v) => {
+                const mesAno = v.dataVenda.substring(0, 7);
+                if (!acc[mesAno]) {
+                    acc[mesAno] = { vendas: 0, creditos: 0 };
+                }
+                acc[mesAno].vendas += v.precoVenda;
+                acc[mesAno].creditos += v.creditoCliente;
+                return acc;
+            }, {});
+
+            const labels = Object.keys(dadosMensais).sort().map(l => {
+                const [ano, mes] = l.split('-');
+                return `${mes}/${ano.substring(2)}`;
+            });
+
+            const vendasData = labels.map(l => dadosMensais[Object.keys(dadosMensais).find(key => key.includes(l.split('/')[0]))].vendas);
+            const creditosData = labels.map(l => dadosMensais[Object.keys(dadosMensais).find(key => key.includes(l.split('/')[0]))].creditos);
+
+            if (vendasCreditosChartInstance) {
+                vendasCreditosChartInstance.destroy();
+            }
+
+            const ctxVendas = document.getElementById('vendasCreditosChart').getContext('2d');
+            vendasCreditosChartInstance = new Chart(ctxVendas, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Vendas (R$)',
+                        data: vendasData,
+                        backgroundColor: 'rgba(139, 92, 246, 0.7)', // primary
+                        borderColor: 'rgba(139, 92, 246, 1)',
+                        borderWidth: 1,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Créditos (R$)',
+                        data: creditosData,
+                        backgroundColor: 'rgba(59, 130, 246, 0.7)', // info
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 1,
+                        type: 'line',
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: 'Vendas' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: { drawOnChartArea: false }, // Não desenha linhas de grade
+                            title: { display: true, text: 'Créditos' }
+                        }
+                    }
+                }
+            });
+
+
+            // 2. Status dos Itens
+            const statusCounts = itens.reduce((acc, item) => {
+                acc[item.status] = (acc[item.status] || 0) + 1;
+                return acc;
+            }, {});
+
+            const statusLabels = Object.keys(statusCounts).map(s => s.replace('-', ' ').toUpperCase());
+            const statusData = Object.values(statusCounts);
+            const statusColors = [
+                '#10b981', // disponivel (success)
+                '#3b82f6', // vendido (info)
+                '#f59e0b', // proximo-bazar (warning)
+                '#ef4444', // devolvido (danger)
+            ];
+
+            if (statusItensChartInstance) {
+                statusItensChartInstance.destroy();
+            }
+
+            const ctxStatus = document.getElementById('statusItensChart').getContext('2d');
+            statusItensChartInstance = new Chart(ctxStatus, {
+                type: 'doughnut',
+                data: {
+                    labels: statusLabels,
+                    datasets: [{
+                        data: statusData,
+                        backgroundColor: statusColors.slice(0, statusLabels.length),
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: { display: true, text: 'Distribuição dos Itens' }
+                    }
+                }
+            });
+        }
+
+        // ========================================
+        // LEMBRETES E ALERTAS
+        // ========================================
+        function atualizarLembretes() {
+            const container = document.getElementById('lista-lembretes');
+            container.innerHTML = '';
+            const lembretes = [];
+
+            // Verificar itens com muitos bazares sem vender (usando status 'proximo-bazar')
+            const itensProblema = itens.filter(i => {
+                return i.status === 'proximo-bazar';
+            });
+            if (itensProblema.length > 0) {
+                lembretes.push({ tipo: 'itens', titulo: 'Itens para Próximo Bazar', descricao: `${itensProblema.length} item(s) aguardando próximo bazar.`, prioridade: 'media' });
+            }
+
+            // Verificar clientes com crédito alto
+            const clientesCreditoAlto = clientes.filter(c => (c.creditos || 0) > 100);
+            if (clientesCreditoAlto.length > 0) {
+                lembretes.push({ tipo: 'creditos', titulo: 'Clientes com Crédito Disponível', descricao: `${clientesCreditoAlto.length} cliente(s) com crédito para usar na loja.`, prioridade: 'baixa' });
+            }
+
+            // Verificar bazar ativo
+            const bazarAtivo = bazares.find(b => b.status === 'ativo');
+            if (!bazarAtivo) {
+                lembretes.push({ tipo: 'bazar', titulo: 'Sem Bazar Ativo', descricao: 'Nenhum bazar está ativo no momento.', prioridade: 'alta' });
+            }
+
+            if (lembretes.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: var(--text-muted);">
+                        <i class="fas fa-check-circle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>Nenhum lembrete ou alerta no momento.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            lembretes.forEach(lembrete => {
+                const item = document.createElement('div');
+                item.className = 'lembrete-item';
+                const icones = { 
+                    'itens': 'fa-tshirt', 
+                    'creditos': 'fa-coins', 
+                    'bazar': 'fa-calendar-alt' 
+                };
+                const corPrioridade = {
+                    'alta': 'var(--danger)',
+                    'media': 'var(--warning)',
+                    'baixa': 'var(--info)'
+                };
+
+                item.style.borderLeftColor = corPrioridade[lembrete.prioridade];
+                
+                item.innerHTML = `
+                    <div class="info">
+                        <strong><i class="fas ${icones[lembrete.tipo]}"></i> ${lembrete.titulo}</strong>
+                        <p style="margin: 0; font-size: 0.9rem; color: var(--text-muted);">${lembrete.descricao}</p>
+                    </div>
+                    <div class="acoes">
+                        <span class="status-badge" style="background: ${corPrioridade[lembrete.prioridade]};">${lembrete.prioridade.toUpperCase()}</span>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+
+        // ========================================
+        // BACKUP E EXPORTAÇÃO
+        // ========================================
+        function exportarDados() {
+            const dadosCompletos = {
+                bazares: bazares,
+                itens: itens,
+                clientes: clientes,
+                vendas: vendas,
+                configuracoes: configuracoes,
+                dataExportacao: new Date().toISOString()
+            };
+            const dadosJSON = JSON.stringify(dadosCompletos, null, 2);
+            const blob = new Blob([dadosJSON], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_bazarplus_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            mostrarNotificacao('Dados exportados com sucesso!', 'sucesso');
+        }
+
+        function importarDados() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        const dados = JSON.parse(event.target.result);
+                        if (confirm('Isso substituirá todos os dados atuais. Continuar?')) {
+                            bazares = dados.bazares || [];
+                            itens = dados.itens || [];
+                            clientes = dados.clientes || [];
+                            vendas = dados.vendas || [];
+                            configuracoes = { ...configuracoes, ...dados.configuracoes };
+                            salvarDados();
+                            checkInitializers();
+                            mostrarNotificacao('Dados importados com sucesso!', 'sucesso');
+                        }
+                    } catch (error) {
+                        mostrarNotificacao('Erro ao importar dados. Arquivo inválido.', 'erro');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function criarBackupAutomatico() {
+            localStorage.setItem('bazarPlus_backup', JSON.stringify({
+                bazares: bazares,
+                itens: itens,
+                clientes: clientes,
+                vendas: vendas,
+                configuracoes: configuracoes,
+                dataBackup: new Date().toISOString()
+            }));
+            document.getElementById('ultimoBackup').textContent = new Date().toLocaleString('pt-BR');
+            mostrarNotificacao('Backup automático criado com sucesso!', 'sucesso');
+        }
+
+        // ========================================
+        // INICIALIZAÇÃO
+        // ========================================
+        function checkInitializers() {
+            // Inicializa a interface
+            abrirTab('dashboard');
+            
+            // Configura o tema
+            const temaAtual = configuracoes.tema || 'light';
+            document.body.setAttribute('data-theme', temaAtual);
+            const icon = document.querySelector('.theme-toggle i');
+            icon.className = temaAtual === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            
+            // Configurações iniciais
+            carregarConfiguracoes();
+            carregarOpcoesClientes();
+            carregarItensDisponiveis();
+            atualizarListaClientes();
+            atualizarListaItens();
+            atualizarListaVendas();
+
+            // Sincroniza porcentagens
+            document.getElementById('percentualCliente').addEventListener('input', function() {
+                const percentualCliente = parseFloat(this.value) || 0;
+                document.getElementById('percentualLoja').value = 100 - percentualCliente;
+            });
+            document.getElementById('percentualLoja').addEventListener('input', function() {
+                const percentualLoja = parseFloat(this.value) || 0;
+                document.getElementById('percentualCliente').value = 100 - percentualLoja;
+            });
+
+            // Adiciona listener para recalcular resumo da venda ao mudar o preço
+            document.getElementById('vendaPreco').addEventListener('input', calcularResumoVenda);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarDados();
+            checkInitializers();
+
+            // Atalhos de teclado
+            document.addEventListener('keydown', function(e) {
+                // Ctrl+S para salvar (Cadastrar Item/Cliente)
+                if (e.ctrlKey && e.key === 's') {
+                    e.preventDefault();
+                    const tabAtiva = document.querySelector('.tab-content.active').id;
+                    if (tabAtiva === 'itens') {
+                        adicionarItem();
+                    } else if (tabAtiva === 'clientes') {
+                        adicionarCliente();
+                    } else if (tabAtiva === 'bazares') {
+                        criarBazar();
+                    }
+                }
+                // Ctrl+E para exportar
+                if (e.ctrlKey && e.key === 'e') {
+                    e.preventDefault();
+                    exportarDados();
+                }
+            });
+        });
     </script>
 </body>
 </html>
