@@ -598,12 +598,17 @@
 
 
         // =========================================
-        // GESTÃO DE ITENS
+        // GESTÃO DE ITENS (CORRIGIDO)
         // =========================================
         function popularSelectsItens() {
             const selectConsignatario = document.getElementById('itemConsignatarioId');
             const selectBazar = document.getElementById('itemBazarId');
             
+            // CORREÇÃO: Verifica se os elementos existem antes de tentar manipulá-los.
+            if (!selectConsignatario || !selectBazar) {
+                return; 
+            }
+
             [selectConsignatario, selectBazar].forEach(select => select.innerHTML = '<option value="">Selecione...</option>');
 
             clientes.forEach(c => {
@@ -760,19 +765,24 @@
         
         
         // =========================================
-        // GESTÃO DE VENDAS
+        // GESTÃO DE VENDAS (CORRIGIDO)
         // =========================================
         function popularSelectsVenda() {
             const selectItem = document.getElementById('vendaItemId');
             const selectComprador = document.getElementById('vendaCompradorId');
             
+            // CORREÇÃO: Verifica se os elementos existem antes de tentar manipulá-los.
+            if (!selectItem || !selectComprador) {
+                return;
+            }
+
             // Itens: Apenas itens disponíveis e com quantidade > 0
             const itensDisponiveis = itens.filter(i => i.quantidade > 0 && i.status !== 'Vendido');
             
             selectItem.innerHTML = '<option value="">Selecione o Item...</option>';
             itensDisponiveis.forEach(i => {
                 const consignatario = clientes.find(c => c.id === i.consignatarioId);
-                selectItem.innerHTML += `<option value="${i.id}" data-valor="${i.valor}">${i.descricao} (${consignatario.nome}) - ${formatarMoeda(i.valor)}</option>`;
+                selectItem.innerHTML += `<option value="${i.id}" data-valor="${i.valor}">${i.descricao} (${consignatario ? consignatario.nome : 'N/A'}) - ${formatarMoeda(i.valor)}</option>`;
             });
             
             // Compradores
@@ -782,12 +792,18 @@
             });
             
              // Define a data de hoje como padrão
-            document.getElementById('vendaData').value = obterDataHojeISO();
+            const vendaData = document.getElementById('vendaData');
+            if (vendaData) {
+                 vendaData.value = obterDataHojeISO();
+            }
         }
 
         function atualizarValorVenda() {
             const selectItem = document.getElementById('vendaItemId');
             const valorInput = document.getElementById('vendaValor');
+            
+            if (!selectItem || !valorInput) return;
+
             const selectedOption = selectItem.options[selectItem.selectedIndex];
             
             if (selectedOption && selectedOption.dataset.valor) {
@@ -926,18 +942,26 @@
         }
 
         // =========================================
-        // GESTÃO DE CONSUMOS / RETIRADAS
+        // GESTÃO DE CONSUMOS / RETIRADAS (CORRIGIDO)
         // =========================================
         function popularSelectsConsumo() {
             const selectConsignatario = document.getElementById('consumoConsignatarioId');
             
+            // CORREÇÃO: Verifica se o elemento existe antes de tentar manipulá-lo.
+            if (!selectConsignatario) {
+                return;
+            }
+
             selectConsignatario.innerHTML = '<option value="">Selecione o Consignatário...</option>';
             clientes.forEach(c => {
                 selectConsignatario.innerHTML += `<option value="${c.id}" data-credito="${c.creditos}">${c.nome} (${formatarMoeda(c.creditos)} de crédito)</option>`;
             });
             
              // Define a data de hoje como padrão
-            document.getElementById('consumoData').value = obterDataHojeISO();
+            const consumoData = document.getElementById('consumoData');
+            if (consumoData) {
+                consumoData.value = obterDataHojeISO();
+            }
         }
 
         function registrarConsumo() {
@@ -1034,6 +1058,9 @@
             const selectBazar = document.getElementById('filterBazar');
             const selectConsignatario = document.getElementById('filterConsignatario');
             
+            // Verifica se estamos na dashboard
+            if (!selectBazar || !selectConsignatario) return;
+
             // Bazares
             selectBazar.innerHTML = '<option value="">Todos os Bazares</option>';
             bazares.forEach(b => {
@@ -1050,7 +1077,9 @@
             
             // Mês (implementação simplificada para o último mês)
             const selectMes = document.getElementById('filterMes');
-            selectMes.value = currentDashboardFilter.mes;
+            if (selectMes) {
+                selectMes.value = currentDashboardFilter.mes;
+            }
         }
 
         function filtrarDashboard() {
@@ -1061,6 +1090,9 @@
         }
 
         function renderizarDashboard() {
+            // Se o canvas de gráficos não existir (não estamos na aba Dashboard), sai.
+            if (!document.getElementById('chartVendasMes')) return;
+            
             let vendasFiltradas = vendas;
 
             // Filtro de Consignatário
@@ -1351,7 +1383,9 @@
             // Atualiza o tema
             document.documentElement.setAttribute('data-theme', configuracoes.tema);
             const icon = document.querySelector('.theme-toggle i');
-            icon.className = configuracoes.tema === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            if (icon) { // Checa se o ícone existe
+                icon.className = configuracoes.tema === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            }
         }
         
         function salvarConfiguracoes() {
