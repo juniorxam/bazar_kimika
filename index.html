@@ -173,7 +173,8 @@
         /* Dashboard */
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            /* Ajustado de 250px para 200px para acomodar 6 cards em telas maiores */
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
             gap: 20px;
             margin-bottom: 20px;
         }
@@ -201,6 +202,7 @@
         .dashboard-card.comissao::before { background-color: var(--info); }
         .dashboard-card.vendas::before { background-color: var(--purple); }
         .dashboard-card.itens::before { background-color: var(--warning); }
+        .dashboard-card.saldo::before { background-color: var(--danger); } /* Novo card Saldo */
 
         .dashboard-card h3 {
             font-size: 1rem;
@@ -225,6 +227,7 @@
         .dashboard-card.comissao .value { color: var(--info); }
         .dashboard-card.vendas .value { color: var(--purple); }
         .dashboard-card.itens .value { color: var(--warning); }
+        .dashboard-card.saldo .value { color: var(--danger); } /* Novo card Saldo */
 
         .progress-bar {
             height: 8px;
@@ -786,8 +789,12 @@
                     </div>
                 </div>
                 <div class="dashboard-card creditos">
-                    <h3>Créditos Gerados</h3>
+                    <h3>Créditos Gerados (80% Vendas)</h3>
                     <p class="value" id="totalCreditos">R$ 0,00</p>
+                </div>
+                <div class="dashboard-card saldo">
+                    <h3>Saldo Atual de Créditos</h3>
+                    <p class="value" id="saldoAtualCreditos">R$ 0,00</p>
                 </div>
                 <div class="dashboard-card comissao">
                     <h3>Comissão da Loja (20%)</h3>
@@ -1512,14 +1519,21 @@
         function atualizarDashboard() {
             // 1. Cálculos de Totais
             const totalVendas = vendas.reduce((acc, v) => acc + v.precoVenda, 0);
-            const totalCreditos = clientes.reduce((acc, c) => acc + (c.creditos || 0), 0) + vendas.reduce((acc, v) => acc + v.creditoCliente, 0);
+
+            // CORREÇÃO: Total de Créditos Gerados é a soma dos 80% de cada venda.
+            const totalCreditosGerados = vendas.reduce((acc, v) => acc + v.creditoCliente, 0);
+            
+            // NOVO: Saldo Atual de Créditos é a soma do saldo de todos os clientes.
+            const saldoTotalCreditos = clientes.reduce((acc, c) => acc + (c.creditos || 0), 0);
+
             const totalComissao = vendas.reduce((acc, v) => acc + v.comissaoLoja, 0);
             const totalItensVendidos = vendas.length;
             const totalItensEstoque = itens.filter(i => i.status === 'disponivel' || i.status === 'proximo-bazar').length;
 
             // 2. Atualiza Cards
             document.getElementById('totalVendas').textContent = formatarMoeda(totalVendas);
-            document.getElementById('totalCreditos').textContent = formatarMoeda(totalCreditos);
+            document.getElementById('totalCreditos').textContent = formatarMoeda(totalCreditosGerados);
+            document.getElementById('saldoAtualCreditos').textContent = formatarMoeda(saldoTotalCreditos); // NOVO CARD
             document.getElementById('totalComissao').textContent = formatarMoeda(totalComissao);
             document.getElementById('totalItensVendidos').textContent = totalItensVendidos.toString();
             document.getElementById('totalItensEstoque').textContent = totalItensEstoque.toString();
@@ -1531,9 +1545,6 @@
 
             // 3. Atualiza Top Clientes
             atualizarTopClientes();
-            
-            // 4. Atualiza Lembretes (Removido o elemento, então remove a chamada)
-            // atualizarLembretes();
         }
 
         function atualizarTopClientes() {
