@@ -1,5 +1,5 @@
 /* =====================================================================
-   SISTEMA DESAPEGOPLUS – script.js (COMPLETO E MODIFICADO)
+   SISTEMA DESAPEGOPLUS – script.js (COMPLETO COM TODAS AS ATUALIZAÇÕES)
    ===================================================================== */
 
 /* ---------------------------------------------------------
@@ -163,7 +163,6 @@ function limparFormulariodesapego() {
     document.getElementById("desapegoTema").value = "";
     document.getElementById("desapegoObservacao").value = "";
     
-    // Resetar botão para criar
     const btn = document.querySelector('#desapegos .btn-primary');
     btn.innerHTML = '<i class="fas fa-check-circle"></i> Criar Desapego';
     btn.onclick = function() { criardesapego(); };
@@ -233,14 +232,12 @@ function editarDesapego(id) {
     const desapego = desapegos.find(b => b.id === id);
     if (!desapego) return;
     
-    // Preencher formulário com dados do desapego
     document.getElementById("desapegoIdEdit").value = desapego.id;
     document.getElementById("desapegoNome").value = desapego.nome;
     document.getElementById("desapegoData").value = desapego.inicio;
     document.getElementById("desapegoTema").value = desapego.tema || '';
     document.getElementById("desapegoObservacao").value = desapego.observacao || '';
     
-    // Mudar texto do botão para "Atualizar"
     const btn = document.querySelector('#desapegos .btn-primary');
     btn.innerHTML = '<i class="fas fa-sync-alt"></i> Atualizar Desapego';
     btn.onclick = function() { atualizarDesapego(desapego.id); };
@@ -272,9 +269,7 @@ function atualizarDesapego(id) {
         salvarDados();
         renderizarDesapegos();
         
-        // Resetar formulário
         limparFormulariodesapego();
-        
         mostrarNotificacao("Desapego atualizado com sucesso!", "sucesso");
     }
 }
@@ -353,13 +348,19 @@ function limparNovoComprador() {
 
 // Função principal para registrar venda completa
 function registrarVendaCompleta() {
+    // Verificar se é edição
+    const vendaIdEdit = document.getElementById("vendaIdEdit");
+    if (vendaIdEdit && vendaIdEdit.value) {
+        atualizarVenda(parseInt(vendaIdEdit.value));
+        return;
+    }
+
     // 1. VALIDAR E OBTER DADOS DA PARCEIRA
     let parceiraId;
     const parceiraExistente = document.getElementById("vendaParceiraExistente").value;
     const novaParceiraDiv = document.getElementById("nova-parceira");
     
     if (novaParceiraDiv.style.display !== "none") {
-        // Cadastrar nova parceira
         const nome = document.getElementById("novaParceiraNome").value.trim();
         const telefone = document.getElementById("novaParceiraTelefone").value.trim();
         const email = document.getElementById("novaParceiraEmail").value.trim();
@@ -369,7 +370,6 @@ function registrarVendaCompleta() {
             return;
         }
         
-        // Criar nova parceira
         const novaParceira = {
             id: gerarId(),
             nome,
@@ -383,7 +383,6 @@ function registrarVendaCompleta() {
         parceiraId = novaParceira.id;
         mostrarNotificacao("Nova parceira cadastrada!", "sucesso");
     } else {
-        // Usar parceira existente
         if (!parceiraExistente) {
             mostrarNotificacao("Selecione uma parceira!", "erro");
             return;
@@ -411,7 +410,6 @@ function registrarVendaCompleta() {
     const novoCompradorDiv = document.getElementById("novo-comprador");
     
     if (novoCompradorDiv.style.display !== "none") {
-        // Cadastrar novo comprador
         const nomeComprador = document.getElementById("novoCompradorNome").value.trim();
         const telefoneComprador = document.getElementById("novoCompradorTelefone").value.trim();
         const emailComprador = document.getElementById("novoCompradorEmail").value.trim();
@@ -421,7 +419,6 @@ function registrarVendaCompleta() {
             return;
         }
         
-        // Criar novo comprador
         const novoComprador = {
             id: gerarId(),
             nome: nomeComprador,
@@ -434,7 +431,6 @@ function registrarVendaCompleta() {
         compradorId = novoComprador.id;
         mostrarNotificacao("Novo comprador cadastrado!", "sucesso");
     } else {
-        // Usar comprador existente
         if (!compradorExistente) {
             mostrarNotificacao("Selecione um comprador!", "erro");
             return;
@@ -452,9 +448,10 @@ function registrarVendaCompleta() {
         return;
     }
 
-    // 5. CRIAR ITEM (sempre com status "vendido")
+    // 5. CRIAR ITEM
+    const itemId = gerarId();
     const item = {
-        id: gerarId(),
+        id: itemId,
         descricao,
         categoria,
         preco,
@@ -464,7 +461,7 @@ function registrarVendaCompleta() {
         consignatarioId: parceiraId,
         observacao: observacaoItem,
         desapegoId: parseInt(desapegoId),
-        status: "vendido", // SEMPRE VENDIDO
+        status: "vendido",
         dataCadastro: new Date().toISOString()
     };
 
@@ -475,23 +472,30 @@ function registrarVendaCompleta() {
     const comissaoLoja = preco * (configuracoes.percentualLoja / 100);
 
     // 7. REGISTRAR VENDA
-    vendas.push({
+    const statusPagamento = formaPagamento === 'Aguardando Pagamento' ? 'pendente' : 'pago';
+    
+    const venda = {
         id: gerarId(),
-        itemId: item.id,
+        itemId: itemId,
         precoVenda: preco,
         dataVenda: dataVenda,
         compradorId: compradorId,
         desapegoId: parseInt(desapegoId),
         pagamento: formaPagamento,
-        creditoConsignatario: creditoParceira,
-        comissaoLoja: comissaoLoja,
-        consignatarioId: parceiraId
-    });
+        creditoConsignatario: statusPagamento === 'pendente' ? 0 : creditoParceira,
+        comissaoLoja: statusPagamento === 'pendente' ? 0 : comissaoLoja,
+        consignatarioId: parceiraId,
+        statusPagamento: statusPagamento
+    };
 
-    // 8. ATUALIZAR CRÉDITO DA PARCEIRA
-    const parceira = consignatarios.find(c => c.id === parceiraId);
-    if (parceira) {
-        parceira.credito = (parceira.credito || 0) + creditoParceira;
+    vendas.push(venda);
+
+    // 8. ATUALIZAR CRÉDITO DA PARCEIRA (apenas se pago)
+    if (statusPagamento === 'pago') {
+        const parceira = consignatarios.find(c => c.id === parceiraId);
+        if (parceira) {
+            parceira.credito = (parceira.credito || 0) + creditoParceira;
+        }
     }
 
     // 9. SALVAR E ATUALIZAR TUDO
@@ -507,13 +511,11 @@ function registrarVendaCompleta() {
 }
 
 function limparFormularioVendaCompleta() {
-    // Limpar dados da parceira
     document.getElementById("vendaParceiraExistente").selectedIndex = 0;
     document.getElementById("selecionar-parceira").style.display = "block";
     document.getElementById("nova-parceira").style.display = "none";
     limparNovaParceira();
     
-    // Limpar dados do item
     document.getElementById("itemDescricao").value = "";
     document.getElementById("itemCategoria").selectedIndex = 0;
     document.getElementById("itemPreco").value = "";
@@ -522,19 +524,31 @@ function limparFormularioVendaCompleta() {
     document.getElementById("itemEstado").selectedIndex = 0;
     document.getElementById("itemObservacao").value = "";
     
-    // Limpar dados do comprador
     document.getElementById("vendaCompradorExistente").selectedIndex = 0;
     document.getElementById("selecionar-comprador").style.display = "block";
     document.getElementById("novo-comprador").style.display = "none";
     limparNovoComprador();
     
-    // Limpar dados da venda
     document.getElementById("vendaDesapego").selectedIndex = 0;
     document.getElementById("vendaData").value = new Date().toISOString().split('T')[0];
     document.getElementById("vendaFormaPagamento").selectedIndex = 0;
     
-    // Limpar resumo
-    document.getElementById("resumoVenda").style.display = "none";
+    // Remover campo oculto de edição
+    const vendaIdEdit = document.getElementById("vendaIdEdit");
+    if (vendaIdEdit) {
+        vendaIdEdit.remove();
+    }
+    
+    const btnRegistrar = document.querySelector('#vendas .btn-success');
+    if (btnRegistrar) {
+        btnRegistrar.innerHTML = '<i class="fas fa-check-circle"></i> Registrar Venda Completa';
+        btnRegistrar.setAttribute('onclick', 'registrarVendaCompleta()');
+    }
+    
+    const resumoVenda = document.getElementById("resumoVenda");
+    if (resumoVenda) {
+        resumoVenda.style.display = "none";
+    }
 }
 
 function calcularResumoVenda() {
@@ -543,20 +557,370 @@ function calcularResumoVenda() {
     const detalhesResumo = document.getElementById("detalhesResumoVenda");
     
     if (isNaN(preco) || preco <= 0) {
-        resumoDiv.style.display = "none";
+        if (resumoDiv) resumoDiv.style.display = "none";
         return;
     }
 
     const creditoParceira = preco * (configuracoes.percentualConsignatario / 100);
     const comissaoLoja = preco * (configuracoes.percentualLoja / 100);
 
-    detalhesResumo.innerHTML = `
-        <p><strong>Valor da Venda:</strong> ${formatarMoeda(preco)}</p>
-        <p><strong>Crédito da Parceira (${configuracoes.percentualConsignatario}%):</strong> ${formatarMoeda(creditoParceira)}</p>
-        <p><strong>Comissão da Loja (${configuracoes.percentualLoja}%):</strong> ${formatarMoeda(comissaoLoja)}</p>
-    `;
+    if (detalhesResumo) {
+        detalhesResumo.innerHTML = `
+            <p><strong>Valor da Venda:</strong> ${formatarMoeda(preco)}</p>
+            <p><strong>Crédito da Parceira (${configuracoes.percentualConsignatario}%):</strong> ${formatarMoeda(creditoParceira)}</p>
+            <p><strong>Comissão da Loja (${configuracoes.percentualLoja}%):</strong> ${formatarMoeda(comissaoLoja)}</p>
+        `;
+    }
     
-    resumoDiv.style.display = "block";
+    if (resumoDiv) {
+        resumoDiv.style.display = "block";
+    }
+}
+
+/* ============================================================
+   7. FUNÇÕES PARA AGUARDANDO PAGAMENTO E EDIÇÃO DE VENDAS
+============================================================ */
+
+// Atualizar dashboard de aguardando pagamento
+function atualizarDashboardAguardandoPagamento() {
+    const vendasPendentes = vendas.filter(v => 
+        v.statusPagamento === 'pendente'
+    );
+    
+    const totalAguardando = vendasPendentes.reduce((acc, v) => acc + parseFloat(v.precoVenda || 0), 0);
+    
+    const elemento = document.getElementById('totalAguardandoPagamento');
+    if (elemento) {
+        elemento.textContent = `R$ ${totalAguardando.toFixed(2)}`;
+    }
+    
+    // Atualizar progresso
+    const totalVendas = vendas.reduce((acc, v) => acc + parseFloat(v.precoVenda || 0), 0);
+    const percentual = totalVendas > 0 ? (totalAguardando / totalVendas) * 100 : 0;
+    const progresso = document.getElementById('progressAguardando');
+    if (progresso) {
+        progresso.style.width = `${percentual}%`;
+    }
+    
+    return totalAguardando;
+}
+
+// Confirmar pagamento de venda pendente
+function confirmarPagamento(vendaId) {
+    if (!confirm(`Confirmar pagamento da venda ${vendaId}?`)) {
+        return;
+    }
+    
+    const vendaIndex = vendas.findIndex(v => v.id == vendaId);
+    
+    if (vendaIndex === -1) {
+        mostrarNotificacao('Venda não encontrada!', 'erro');
+        return;
+    }
+    
+    const venda = vendas[vendaIndex];
+    const preco = parseFloat(venda.precoVenda) || 0;
+    
+    // Atualizar status da venda
+    vendas[vendaIndex].statusPagamento = 'pago';
+    vendas[vendaIndex].pagamento = 'Pagamento Confirmado';
+    
+    // Calcular crédito e comissão
+    const creditoParceira = preco * (configuracoes.percentualConsignatario / 100);
+    const comissaoLoja = preco * (configuracoes.percentualLoja / 100);
+    
+    // Atualizar créditos na venda
+    vendas[vendaIndex].creditoConsignatario = creditoParceira;
+    vendas[vendaIndex].comissaoLoja = comissaoLoja;
+    
+    // Atualizar saldo da parceira
+    const parceiraIndex = consignatarios.findIndex(p => p.id === venda.consignatarioId);
+    
+    if (parceiraIndex !== -1) {
+        consignatarios[parceiraIndex].credito = (consignatarios[parceiraIndex].credito || 0) + creditoParceira;
+    }
+    
+    salvarDados();
+    mostrarNotificacao(`Pagamento confirmado! R$ ${creditoParceira.toFixed(2)} em créditos adicionados para a parceira.`, 'sucesso');
+    
+    // Atualizar interface
+    renderizarVendas();
+    renderizarDashboard();
+    atualizarDashboardAguardandoPagamento();
+    if (document.getElementById('parceiras').classList.contains('active')) {
+        renderizarConsignatarios();
+    }
+}
+
+// Editar venda existente
+function editarVenda(vendaId) {
+    const venda = vendas.find(v => v.id == vendaId);
+    
+    if (!venda) {
+        mostrarNotificacao('Venda não encontrada!', 'erro');
+        return;
+    }
+    
+    // Abrir aba de vendas
+    abrirTab('vendas');
+    
+    // Preencher formulário
+    setTimeout(() => {
+        // Preencher dados do item
+        const item = itens.find(i => i.id == venda.itemId);
+        if (item) {
+            document.getElementById('itemDescricao').value = item.descricao || '';
+            document.getElementById('itemCategoria').value = item.categoria || 'roupa';
+            document.getElementById('itemPreco').value = item.preco || '';
+            document.getElementById('itemTamanho').value = item.tamanho || '';
+            document.getElementById('itemMarca').value = item.marca || '';
+            document.getElementById('itemEstado').value = item.estado || 'seminovo';
+            document.getElementById('itemObservacao').value = item.observacao || '';
+        }
+        
+        // Selecionar parceira
+        const selectParceira = document.getElementById('vendaParceiraExistente');
+        if (selectParceira) {
+            selectParceira.value = venda.consignatarioId || '';
+            // Ocultar formulário de nova parceira
+            document.getElementById('nova-parceira').style.display = 'none';
+            document.getElementById('selecionar-parceira').style.display = 'grid';
+        }
+        
+        // Selecionar comprador
+        const selectComprador = document.getElementById('vendaCompradorExistente');
+        if (selectComprador) {
+            selectComprador.value = venda.compradorId || '';
+            // Ocultar formulário de novo comprador
+            document.getElementById('novo-comprador').style.display = 'none';
+            document.getElementById('selecionar-comprador').style.display = 'grid';
+        }
+        
+        // Dados da venda
+        document.getElementById('vendaDesapego').value = venda.desapegoId || '';
+        document.getElementById('vendaData').value = venda.dataVenda || '';
+        document.getElementById('vendaFormaPagamento').value = venda.pagamento || 'dinheiro';
+        
+        // Adicionar campo oculto para ID da venda
+        let vendaIdEdit = document.getElementById('vendaIdEdit');
+        if (!vendaIdEdit) {
+            vendaIdEdit = document.createElement('input');
+            vendaIdEdit.type = 'hidden';
+            vendaIdEdit.id = 'vendaIdEdit';
+            document.querySelector('#vendas .card').appendChild(vendaIdEdit);
+        }
+        vendaIdEdit.value = vendaId;
+        
+        // Mudar botão
+        const btnRegistrar = document.querySelector('#vendas .btn-success');
+        if (btnRegistrar) {
+            btnRegistrar.innerHTML = '<i class="fas fa-save"></i> Atualizar Venda';
+            btnRegistrar.setAttribute('onclick', `atualizarVenda(${vendaId})`);
+        }
+        
+        // Rolar para o topo do formulário
+        window.scrollTo({ top: document.getElementById('vendas').offsetTop - 100, behavior: 'smooth' });
+        
+        mostrarNotificacao('Modo edição ativado. Altere os dados e clique em "Atualizar Venda"', 'info');
+    }, 300);
+}
+
+// Atualizar venda
+function atualizarVenda(vendaId) {
+    const vendaIndex = vendas.findIndex(v => v.id == vendaId);
+    
+    if (vendaIndex === -1) {
+        mostrarNotificacao('Venda não encontrada!', 'erro');
+        return;
+    }
+    
+    // Coletar dados do formulário
+    const dadosForm = coletarDadosVendaParaEdicao();
+    
+    if (!dadosForm) {
+        return;
+    }
+    
+    // Manter dados importantes
+    dadosForm.id = parseInt(vendaId);
+    dadosForm.statusPagamento = vendas[vendaIndex].statusPagamento || 
+        (dadosForm.pagamento === 'Aguardando Pagamento' ? 'pendente' : 'pago');
+    
+    // Se a venda já estava paga, manter créditos
+    if (dadosForm.statusPagamento === 'pago') {
+        dadosForm.creditoConsignatario = vendas[vendaIndex].creditoConsignatario;
+        dadosForm.comissaoLoja = vendas[vendaIndex].comissaoLoja;
+    } else {
+        // Recalcular créditos se necessário
+        const preco = parseFloat(dadosForm.precoVenda) || 0;
+        if (dadosForm.pagamento !== 'Aguardando Pagamento') {
+            dadosForm.creditoConsignatario = preco * (configuracoes.percentualConsignatario / 100);
+            dadosForm.comissaoLoja = preco * (configuracoes.percentualLoja / 100);
+            dadosForm.statusPagamento = 'pago';
+        } else {
+            dadosForm.creditoConsignatario = 0;
+            dadosForm.comissaoLoja = 0;
+            dadosForm.statusPagamento = 'pendente';
+        }
+    }
+    
+    // Atualizar venda
+    vendas[vendaIndex] = dadosForm;
+    
+    // Atualizar item associado
+    const itemIndex = itens.findIndex(i => i.id == vendas[vendaIndex].itemId);
+    if (itemIndex !== -1) {
+        itens[itemIndex] = {
+            ...itens[itemIndex],
+            descricao: dadosForm.itemDescricao,
+            categoria: dadosForm.categoria,
+            preco: dadosForm.precoVenda,
+            tamanho: dadosForm.tamanho,
+            marca: dadosForm.marca,
+            estado: dadosForm.estado,
+            observacao: dadosForm.observacaoItem,
+            consignatarioId: dadosForm.consignatarioId,
+            desapegoId: dadosForm.desapegoId
+        };
+    }
+    
+    salvarDados();
+    
+    // Restaurar botão
+    const btnRegistrar = document.querySelector('#vendas .btn-success');
+    if (btnRegistrar) {
+        btnRegistrar.innerHTML = '<i class="fas fa-check-circle"></i> Registrar Venda Completa';
+        btnRegistrar.setAttribute('onclick', 'registrarVendaCompleta()');
+    }
+    
+    // Remover campo oculto de edição
+    const vendaIdEdit = document.getElementById('vendaIdEdit');
+    if (vendaIdEdit) {
+        vendaIdEdit.remove();
+    }
+    
+    mostrarNotificacao('Venda atualizada com sucesso!', 'sucesso');
+    limparFormularioVendaCompleta();
+    renderizarVendas();
+    renderizarDashboard();
+    atualizarDashboardAguardandoPagamento();
+}
+
+// Função auxiliar: coletar dados do formulário para edição
+function coletarDadosVendaParaEdicao() {
+    // 1. VALIDAR E OBTER DADOS DA PARCEIRA
+    let parceiraId;
+    const parceiraExistente = document.getElementById("vendaParceiraExistente").value;
+    const novaParceiraDiv = document.getElementById("nova-parceira");
+    
+    if (novaParceiraDiv.style.display !== "none") {
+        const nome = document.getElementById("novaParceiraNome").value.trim();
+        const telefone = document.getElementById("novaParceiraTelefone").value.trim();
+        const email = document.getElementById("novaParceiraEmail").value.trim();
+        
+        if (!nome || !telefone) {
+            mostrarNotificacao("Preencha nome e telefone da parceira!", "erro");
+            return null;
+        }
+        
+        const novaParceira = {
+            id: gerarId(),
+            nome,
+            telefone,
+            email,
+            credito: 0,
+            status: "ativo"
+        };
+        
+        consignatarios.push(novaParceira);
+        parceiraId = novaParceira.id;
+    } else {
+        if (!parceiraExistente) {
+            mostrarNotificacao("Selecione uma parceira!", "erro");
+            return null;
+        }
+        parceiraId = parseInt(parceiraExistente);
+    }
+
+    // 2. VALIDAR DADOS DO ITEM
+    const descricao = document.getElementById("itemDescricao").value.trim();
+    const categoria = document.getElementById("itemCategoria").value;
+    const preco = parseFloat(document.getElementById("itemPreco").value);
+    const tamanho = document.getElementById("itemTamanho").value.trim();
+    const marca = document.getElementById("itemMarca").value.trim();
+    const estado = document.getElementById("itemEstado").value;
+    const observacaoItem = document.getElementById("itemObservacao").value.trim();
+
+    if (!descricao || isNaN(preco) || preco <= 0) {
+        mostrarNotificacao("Preencha descrição e preço do item!", "erro");
+        return null;
+    }
+
+    // 3. VALIDAR E OBTER DADOS DO COMPRADOR
+    let compradorId;
+    const compradorExistente = document.getElementById("vendaCompradorExistente").value;
+    const novoCompradorDiv = document.getElementById("novo-comprador");
+    
+    if (novoCompradorDiv.style.display !== "none") {
+        const nomeComprador = document.getElementById("novoCompradorNome").value.trim();
+        const telefoneComprador = document.getElementById("novoCompradorTelefone").value.trim();
+        const emailComprador = document.getElementById("novoCompradorEmail").value.trim();
+        
+        if (!nomeComprador || !telefoneComprador) {
+            mostrarNotificacao("Preencha nome e telefone do comprador!", "erro");
+            return null;
+        }
+        
+        const novoComprador = {
+            id: gerarId(),
+            nome: nomeComprador,
+            telefone: telefoneComprador,
+            email: emailComprador,
+            status: "ativo"
+        };
+        
+        compradores.push(novoComprador);
+        compradorId = novoComprador.id;
+    } else {
+        if (!compradorExistente) {
+            mostrarNotificacao("Selecione um comprador!", "erro");
+            return null;
+        }
+        compradorId = parseInt(compradorExistente);
+    }
+
+    // 4. VALIDAR DADOS DA VENDA
+    const formaPagamento = document.getElementById("vendaFormaPagamento").value;
+    const dataVenda = document.getElementById("vendaData").value;
+    const desapegoId = document.getElementById("vendaDesapego").value;
+
+    if (!desapegoId) {
+        mostrarNotificacao("Selecione o desapego!", "erro");
+        return null;
+    }
+
+    // Criar novo itemId para evitar conflitos
+    const novoItemId = gerarId();
+
+    return {
+        itemId: novoItemId,
+        precoVenda: preco,
+        dataVenda: dataVenda,
+        compradorId: compradorId,
+        desapegoId: parseInt(desapegoId),
+        pagamento: formaPagamento,
+        creditoConsignatario: 0,
+        comissaoLoja: 0,
+        consignatarioId: parceiraId,
+        
+        // Dados do item para referência
+        itemDescricao: descricao,
+        categoria: categoria,
+        tamanho: tamanho,
+        marca: marca,
+        estado: estado,
+        observacaoItem: observacaoItem
+    };
 }
 
 function renderizarVendas() {
@@ -570,6 +934,10 @@ function renderizarVendas() {
         const comprador = compradores.find(c => c.id == v.compradorId);
         const consignatario = consignatarios.find(c => c.id == v.consignatarioId);
         const desapego = desapegos.find(b => b.id == v.desapegoId);
+        
+        const statusPagamento = v.statusPagamento || (v.pagamento === 'Aguardando Pagamento' ? 'pendente' : 'pago');
+        const statusText = statusPagamento === 'pago' ? 'Pago' : 'Pendente';
+        const statusClass = statusPagamento === 'pago' ? 'pago' : 'pendente';
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -583,15 +951,60 @@ function renderizarVendas() {
             <td>${formatarMoeda(v.creditoConsignatario)}</td>
             <td>${formatarMoeda(v.comissaoLoja)}</td>
             <td>${v.pagamento}</td>
+            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
             <td class="table-actions">
-                <button onclick="estornarVenda(${v.id})" title="Estornar" class="delete">
-                    <i class="fas fa-undo"></i>
+                <button onclick="editarVenda(${v.id})" title="Editar">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button onclick="confirmarPagamento(${v.id})" 
+                        class="${statusPagamento === 'pendente' ? 'btn-confirmar-pagamento' : ''}" 
+                        title="Confirmar Pagamento"
+                        ${statusPagamento === 'pago' ? 'disabled style="opacity:0.5"' : ''}>
+                    <i class="fas fa-check-circle"></i>
+                </button>
+                <button onclick="excluirVenda(${v.id})" title="Excluir" class="delete">
+                    <i class="fas fa-trash"></i>
                 </button>
             </td>
         `;
 
         tbody.appendChild(tr);
     });
+}
+
+function excluirVenda(vendaId) {
+    if (!confirm("Tem certeza que deseja excluir esta venda?")) return;
+    
+    const vendaIndex = vendas.findIndex(v => v.id == vendaId);
+    if (vendaIndex === -1) return;
+    
+    const venda = vendas[vendaIndex];
+    const item = itens.find(i => i.id == venda.itemId);
+    
+    if (item) {
+        const itemIndex = itens.findIndex(i => i.id == venda.itemId);
+        if (itemIndex !== -1) {
+            itens.splice(itemIndex, 1);
+        }
+    }
+    
+    // Reverter crédito da parceira se a venda já estava paga
+    if (venda.statusPagamento === 'pago') {
+        const consignatario = consignatarios.find(c => c.id == venda.consignatarioId);
+        if (consignatario) {
+            consignatario.credito = Math.max(0, (consignatario.credito || 0) - venda.creditoConsignatario);
+        }
+    }
+    
+    vendas.splice(vendaIndex, 1);
+    
+    salvarDados();
+    renderizarVendas();
+    renderizarConsignatarios();
+    renderizarDashboard();
+    renderizarOpcoesSelects();
+    
+    mostrarNotificacao("Venda excluída com sucesso!", "sucesso");
 }
 
 function estornarVenda(vendaId) {
@@ -625,7 +1038,7 @@ function estornarVenda(vendaId) {
 }
 
 /* ============================================================
-   7. PARCEIRAS (CONSIGNATÁRIOS)
+   8. PARCEIRAS (CONSIGNATÁRIOS)
 ============================================================ */
 function adicionarParceira() {
     const nome = document.getElementById("consignatarioNome").value.trim();
@@ -665,7 +1078,6 @@ function limparFormularioParceira() {
     document.getElementById("consignatarioEmail").value = "";
     document.getElementById("consignatarioObservacao").value = "";
     
-    // Resetar botão
     const btn = document.querySelector('#parceiras .btn-primary');
     btn.innerHTML = '<i class="fas fa-check-circle"></i> Cadastrar Parceira';
     btn.onclick = function() { adicionarParceira(); };
@@ -788,7 +1200,7 @@ function atualizarConsignatario(id) {
 }
 
 /* ============================================================
-   8. COMPRADORES
+   9. COMPRADORES
 ============================================================ */
 function adicionarComprador() {
     const nome = document.getElementById("compradorNome").value.trim();
@@ -824,7 +1236,6 @@ function limparFormularioComprador() {
     document.getElementById("compradorEmail").value = "";
     document.getElementById("compradorObservacao").value = "";
     
-    // Resetar botão
     const btn = document.querySelector('#compradores .btn-primary');
     btn.innerHTML = '<i class="fas fa-check-circle"></i> Cadastrar Comprador';
     btn.onclick = function() { adicionarComprador(); };
@@ -933,7 +1344,7 @@ function atualizarComprador(id) {
 }
 
 /* ============================================================
-   9. CONSUMO DE CRÉDITOS
+   10. CONSUMO DE CRÉDITOS
 ============================================================ */
 function atualizarSaldoConsumo() {
     const consignatarioId = document.getElementById("consumoParceira").value;
@@ -1088,7 +1499,7 @@ function estornarConsumo(consumoId) {
 }
 
 /* ============================================================
-   10. SELECTS GERAIS
+   11. SELECTS GERAIS
 ============================================================ */
 function renderizarOpcoesSelects() {
     // Parceiras para venda
@@ -1129,10 +1540,9 @@ function renderizarOpcoesSelects() {
 }
 
 /* ============================================================
-   11. DASHBOARD
+   12. DASHBOARD (ATUALIZADO COM AGUARDANDO PAGAMENTO)
 ============================================================ */
 function popularFiltrosDashboard() {
-    // Popular meses
     const selectMes = document.getElementById("filtroDashboardMes");
     if (selectMes) {
         selectMes.innerHTML = '<option value="">Todos</option>';
@@ -1143,7 +1553,6 @@ function popularFiltrosDashboard() {
         });
     }
 
-    // Popular desapegos
     const selectDesapego = document.getElementById("filtroDashboardDesapego");
     if (selectDesapego) {
         selectDesapego.innerHTML = '<option value="">Todos</option>';
@@ -1152,7 +1561,6 @@ function popularFiltrosDashboard() {
         });
     }
 
-    // Popular parceiras
     const selectParceira = document.getElementById("filtroDashboardParceira");
     if (selectParceira) {
         selectParceira.innerHTML = '<option value="">Todos</option>';
@@ -1167,7 +1575,6 @@ function aplicarFiltroDashboard() {
     const desapegoId = document.getElementById("filtroDashboardDesapego").value;
     const parceiraId = document.getElementById("filtroDashboardParceira").value;
 
-    // Filtrar vendas baseado nos critérios
     let vendasFiltradas = vendas;
 
     if (mes) {
@@ -1185,29 +1592,24 @@ function aplicarFiltroDashboard() {
         vendasFiltradas = vendasFiltradas.filter(v => v.consignatarioId == parceiraId);
     }
 
-    // Recalcular métricas com dados filtrados
     atualizarDashboardComFiltros(vendasFiltradas);
 }
 
 function atualizarDashboardComFiltros(vendasFiltradas) {
-    // Calcular totais baseado nas vendas filtradas
     const totalVendasFiltrado = vendasFiltradas.reduce((acc, v) => acc + v.precoVenda, 0);
     const totalCreditosFiltrado = vendasFiltradas.reduce((acc, v) => acc + v.creditoConsignatario, 0);
     const totalComissaoFiltrado = vendasFiltradas.reduce((acc, v) => acc + v.comissaoLoja, 0);
 
-    // Atualizar os cards do dashboard
     document.getElementById("totalVendas").textContent = formatarMoeda(totalVendasFiltrado);
     document.getElementById("totalCreditos").textContent = formatarMoeda(totalCreditosFiltrado);
     document.getElementById("totalComissao").textContent = formatarMoeda(totalComissaoFiltrado);
     document.getElementById("totalItensVendidos").textContent = vendasFiltradas.length;
 
-    // Atualizar progresso de vendas
     const progressVendas = document.getElementById("progressVendas");
     const metaVendas = 10000;
     const percentualVendas = Math.min((totalVendasFiltrado / metaVendas) * 100, 100);
     progressVendas.style.width = `${percentualVendas}%`;
 
-    // Atualizar top parceiras com dados filtrados
     renderizarTopParceirasComFiltros(vendasFiltradas);
 }
 
@@ -1254,7 +1656,6 @@ function resetarFiltrosDashboard() {
     document.getElementById("filtroDashboardDesapego").value = "";
     document.getElementById("filtroDashboardParceira").value = "";
     
-    // Recarregar dashboard sem filtros
     renderizarDashboard();
 }
 
@@ -1270,6 +1671,9 @@ function renderizarDashboard() {
     const totalComissao = vendas.reduce((acc, v) => acc + v.comissaoLoja, 0);
     const totalCreditos = vendas.reduce((acc, v) => acc + v.creditoConsignatario, 0);
     const creditosAtivos = consignatarios.reduce((acc, c) => acc + (c.credito || 0), 0);
+    
+    // Calcular aguardando pagamento
+    const totalAguardando = atualizarDashboardAguardandoPagamento();
 
     // Atualizar cards
     document.getElementById("totalVendas").textContent = formatarMoeda(totalArrecadado);
@@ -1277,7 +1681,6 @@ function renderizarDashboard() {
     document.getElementById("creditosAtivos").textContent = formatarMoeda(creditosAtivos);
     document.getElementById("totalComissao").textContent = formatarMoeda(totalComissao);
     document.getElementById("totalItensVendidos").textContent = itensVendidos;
-    document.getElementById("totalItensEstoque").textContent = itensVendidos; // Agora mostra itens vendidos
 
     // Progresso de vendas
     const progressVendas = document.getElementById("progressVendas");
@@ -1373,13 +1776,33 @@ function renderizarLembretes() {
         lista.appendChild(lembrete);
     }
 
+    // Lembrete de vendas aguardando pagamento
+    const vendasPendentes = vendas.filter(v => v.statusPagamento === 'pendente');
+    if (vendasPendentes.length > 0) {
+        const totalPendente = vendasPendentes.reduce((acc, v) => acc + v.precoVenda, 0);
+        const lembrete = document.createElement("div");
+        lembrete.className = "lembrete-item";
+        lembrete.innerHTML = `
+            <div class="info">
+                <strong>Vendas Aguardando Pagamento</strong>
+                <p>${vendasPendentes.length} venda(s) pendente(s) - Total: R$ ${totalPendente.toFixed(2)}</p>
+            </div>
+            <div class="acoes">
+                <button onclick="abrirTab('vendas')" class="btn btn-warning btn-sm">
+                    <i class="fas fa-clock"></i> Ver Vendas
+                </button>
+            </div>
+        `;
+        lista.appendChild(lembrete);
+    }
+
     if (lista.children.length === 0) {
         lista.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Nenhum lembrete no momento</p>';
     }
 }
 
 /* ============================================================
-   12. CONFIGURAÇÕES
+   13. CONFIGURAÇÕES
 ============================================================ */
 function salvarConfiguracoes() {
     const pctCons = parseFloat(document.getElementById("percentualParceira").value);
@@ -1409,7 +1832,7 @@ function carregarConfiguracoes() {
 }
 
 /* ============================================================
-   13. EXPORTAR / IMPORTAR DADOS
+   14. EXPORTAR / IMPORTAR DADOS
 ============================================================ */
 function exportarDados() {
     const dados = {
@@ -1473,7 +1896,7 @@ function processarImportacao(event) {
     };
 
     reader.readAsText(file);
-    event.target.value = ""; // Resetar input
+    event.target.value = "";
 }
 
 function atualizarInfoBackup() {
@@ -1489,7 +1912,7 @@ function atualizarInfoBackup() {
 }
 
 /* ============================================================
-   14. RELATÓRIOS PDF PADRONIZADOS
+   15. RELATÓRIOS PDF PADRONIZADOS (INCLUINDO AGUARDANDO PAGAMENTO)
 ============================================================ */
 
 function gerarRelatorioVendasPorDesapegoPDF() {
@@ -1651,6 +2074,7 @@ function gerarRelatorioVendasPorDesapegoPDF() {
     }
     
     doc.save("relatorio_vendas_desapego_detalhado.pdf");
+    mostrarNotificacao("Relatório de vendas por desapego gerado com sucesso!", "sucesso");
 }
 
 function gerarRelatorioVendasPorParceiraPDF() {
@@ -1661,7 +2085,7 @@ function gerarRelatorioVendasPorParceiraPDF() {
     const anoAtual = new Date().getFullYear();
     
     // Cabeçalho
-    doc.setFillColor(59, 130, 246); // Azul
+    doc.setFillColor(59, 130, 246);
     doc.rect(0, 0, 297, 25, 'F');
     
     doc.setTextColor(255, 255, 255);
@@ -1824,6 +2248,7 @@ function gerarRelatorioVendasPorParceiraPDF() {
     }
     
     doc.save("relatorio_vendas_parceiras_detalhado.pdf");
+    mostrarNotificacao("Relatório de vendas por parceira gerado com sucesso!", "sucesso");
 }
 
 function gerarRelatorioVendasPorMesPDF() {
@@ -1834,7 +2259,7 @@ function gerarRelatorioVendasPorMesPDF() {
     const anoAtual = new Date().getFullYear();
     
     // Cabeçalho
-    doc.setFillColor(16, 185, 129); // Verde
+    doc.setFillColor(16, 185, 129);
     doc.rect(0, 0, 297, 25, 'F');
     
     doc.setTextColor(255, 255, 255);
@@ -1946,7 +2371,6 @@ function gerarRelatorioVendasPorMesPDF() {
         },
         alternateRowStyles: { fillColor: [245, 245, 245] },
         didDrawPage: function(data) {
-            // Adicionar detalhes mensais após a tabela de resumo
             if (data.pageNumber === 1) {
                 y = data.cursor.y + 15;
                 adicionarDetalhesMensais();
@@ -2050,6 +2474,7 @@ function gerarRelatorioVendasPorMesPDF() {
     }
     
     doc.save(`relatorio_vendas_mensal_detalhado_${anoAtual}.pdf`);
+    mostrarNotificacao("Relatório de vendas por mês gerado com sucesso!", "sucesso");
 }
 
 function gerarRelatorioCreditosPDF() {
@@ -2059,7 +2484,7 @@ function gerarRelatorioCreditosPDF() {
     const dataHoraGeracao = new Date().toLocaleString("pt-BR");
     
     // Cabeçalho
-    doc.setFillColor(245, 158, 11); // Laranja
+    doc.setFillColor(245, 158, 11);
     doc.rect(0, 0, 297, 25, 'F');
     
     doc.setTextColor(255, 255, 255);
@@ -2219,10 +2644,237 @@ function gerarRelatorioCreditosPDF() {
     }
     
     doc.save("relatorio_saldos_creditos_detalhado.pdf");
+    mostrarNotificacao("Relatório de saldos de créditos gerado com sucesso!", "sucesso");
 }
 
 /* ============================================================
-   15. FUNÇÕES GERAIS DO SISTEMA
+   16. RELATÓRIO DE AGUARDANDO PAGAMENTO (NOVO)
+============================================================ */
+function gerarRelatorioAguardandoPagamentoPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF("landscape");
+    
+    const dataHoraGeracao = new Date().toLocaleString("pt-BR");
+    
+    // Cabeçalho
+    doc.setFillColor(245, 158, 11);
+    doc.rect(0, 0, 297, 25, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.text("RELATÓRIO DE VENDAS AGUARDANDO PAGAMENTO", 148, 15, { align: "center" });
+    
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Sistema DesapegoPlus - Gerado em: ${dataHoraGeracao}`, 20, 35);
+    
+    // Filtrar vendas aguardando pagamento
+    const vendasPendentes = vendas.filter(v => 
+        v.statusPagamento === 'pendente'
+    );
+    
+    if (vendasPendentes.length === 0) {
+        doc.setFontSize(14);
+        doc.text("Nenhuma venda aguardando pagamento no momento.", 20, 60);
+        
+        doc.save("relatorio_aguardando_pagamento_vazio.pdf");
+        mostrarNotificacao("Não há vendas aguardando pagamento!", "info");
+        return;
+    }
+    
+    // Resumo executivo
+    const totalPendente = vendasPendentes.reduce((acc, v) => acc + v.precoVenda, 0);
+    const qtdVendas = vendasPendentes.length;
+    
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("RESUMO EXECUTIVO", 20, 48);
+    
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Total Pendente: ${formatarMoeda(totalPendente)}`, 20, 56);
+    doc.text(`Quantidade de Vendas: ${qtdVendas}`, 20, 62);
+    doc.text(`Ticket Médio Pendente: ${formatarMoeda(totalPendente / qtdVendas)}`, 20, 68);
+    doc.text(`Venda Mais Alta: ${formatarMoeda(Math.max(...vendasPendentes.map(v => v.precoVenda)))}`, 120, 56);
+    doc.text(`Venda Mais Baixa: ${formatarMoeda(Math.min(...vendasPendentes.map(v => v.precoVenda)))}`, 120, 62);
+    doc.text(`Percentual do Total: ${((totalPendente / vendas.reduce((acc, v) => acc + v.precoVenda, 0)) * 100).toFixed(1)}%`, 120, 68);
+    
+    let y = 80;
+    
+    // Agrupar por comprador
+    const compradoresPendentes = {};
+    
+    vendasPendentes.forEach(venda => {
+        const comprador = compradores.find(c => c.id == venda.compradorId);
+        const compradorNome = comprador ? comprador.nome : "Comprador não encontrado";
+        
+        if (!compradoresPendentes[compradorNome]) {
+            compradoresPendentes[compradorNome] = {
+                vendas: [],
+                total: 0,
+                telefone: comprador ? comprador.telefone : "Não informado"
+            };
+        }
+        
+        compradoresPendentes[compradorNome].vendas.push(venda);
+        compradoresPendentes[compradorNome].total += venda.precoVenda;
+    });
+    
+    // Ordenar compradores pelo total pendente (decrescente)
+    const compradoresOrdenados = Object.keys(compradoresPendentes).sort((a, b) => 
+        compradoresPendentes[b].total - compradoresPendentes[a].total
+    );
+    
+    compradoresOrdenados.forEach((nomeComprador, index) => {
+        const dadosComprador = compradoresPendentes[nomeComprador];
+        
+        // Verificar se precisa de nova página
+        if (y > 180) {
+            doc.addPage();
+            y = 20;
+        }
+        
+        // Cabeçalho do comprador
+        doc.setFillColor(240, 240, 240);
+        doc.rect(20, y, 257, 12, 'F');
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(0, 0, 0);
+        doc.text(`${index + 1}. ${nomeComprador}`, 22, y + 8);
+        
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Telefone: ${dadosComprador.telefone}`, 180, y + 8);
+        doc.text(`Total Pendente: ${formatarMoeda(dadosComprador.total)}`, 220, y + 8);
+        doc.text(`Vendas: ${dadosComprador.vendas.length}`, 260, y + 8);
+        
+        y += 15;
+        
+        // Tabela de vendas do comprador
+        const linhasVendas = dadosComprador.vendas.map(v => {
+            const item = itens.find(i => i.id === v.itemId);
+            const consignatario = consignatarios.find(c => c.id === v.consignatarioId);
+            const desapego = desapegos.find(d => d.id === v.desapegoId);
+            
+            return [
+                formatarData(v.dataVenda),
+                item ? item.descricao.substring(0, 25) + (item.descricao.length > 25 ? '...' : '') : "-",
+                consignatario ? consignatario.nome.substring(0, 20) : "-",
+                desapego ? desapego.nome.substring(0, 20) : "-",
+                v.pagamento,
+                formatarMoeda(v.precoVenda),
+                "Pendente"
+            ];
+        });
+        
+        doc.autoTable({
+            head: [["Data", "Item", "Parceira", "Desapego", "Pagamento", "Valor", "Status"]],
+            body: linhasVendas,
+            startY: y,
+            margin: { left: 20, right: 20 },
+            styles: { fontSize: 7, cellPadding: 1.5 },
+            headStyles: { 
+                fillColor: [100, 100, 100], 
+                textColor: 255, 
+                fontSize: 7,
+                fontStyle: 'bold'
+            },
+            alternateRowStyles: { fillColor: [245, 245, 245] },
+            tableLineWidth: 0.1,
+            tableLineColor: [200, 200, 200]
+        });
+        
+        y = doc.lastAutoTable.finalY + 8;
+        
+        // Resumo do comprador
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "bold");
+        doc.text("RESUMO:", 22, y);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Total Pendente: ${formatarMoeda(dadosComprador.total)}`, 80, y);
+        doc.text(`Quantidade de Vendas: ${dadosComprador.vendas.length}`, 130, y);
+        doc.text(`Ticket Médio: ${formatarMoeda(dadosComprador.total / dadosComprador.vendas.length)}`, 180, y);
+        doc.text(`Última Venda: ${formatarData(dadosComprador.vendas[dadosComprador.vendas.length - 1].dataVenda)}`, 230, y);
+        
+        y += 12;
+        
+        // Linha separadora
+        doc.setDrawColor(200, 200, 200);
+        doc.line(20, y, 277, y);
+        y += 5;
+    });
+    
+    // Página de resumo geral
+    doc.addPage();
+    
+    // Gráfico de distribuição (simulado)
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text("DISTRIBUIÇÃO POR COMPRADOR", 20, 30);
+    
+    let yResumo = 50;
+    let xResumo = 20;
+    
+    compradoresOrdenados.forEach((nomeComprador, index) => {
+        const dadosComprador = compradoresPendentes[nomeComprador];
+        const percentual = (dadosComprador.total / totalPendente) * 100;
+        
+        // Barra horizontal
+        const larguraBarra = (percentual / 100) * 250;
+        doc.setFillColor(139, 92, 246);
+        doc.rect(xResumo, yResumo, larguraBarra, 8, 'F');
+        
+        // Texto
+        doc.setFontSize(8);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`${nomeComprador.substring(0, 15)}... - ${formatarMoeda(dadosComprador.total)} (${percentual.toFixed(1)}%)`, 
+                xResumo + 5, yResumo + 6);
+        
+        yResumo += 12;
+        
+        if (yResumo > 180 && index < compradoresOrdenados.length - 1) {
+            doc.addPage();
+            yResumo = 30;
+        }
+    });
+    
+    // Recomendações
+    yResumo += 20;
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.text("RECOMENDAÇÕES PARA AÇÃO:", 20, yResumo);
+    
+    yResumo += 10;
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.text("1. Priorize o contato com os compradores com maior valor pendente", 20, yResumo);
+    yResumo += 8;
+    doc.text("2. Estabeleça prazos claros para pagamento", 20, yResumo);
+    yResumo += 8;
+    doc.text("3. Ofereça facilidades de pagamento (Parcelamento, PIX, etc.)", 20, yResumo);
+    yResumo += 8;
+    doc.text("4. Mantenha registro de todos os contatos realizados", 20, yResumo);
+    yResumo += 8;
+    doc.text("5. Considere políticas de desconto para pagamento antecipado", 20, yResumo);
+    
+    // Rodapé em todas as páginas
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Página ${i} de ${pageCount}`, 148, 205, { align: "center" });
+        doc.text("Sistema DesapegoPlus - Relatórios Gerenciais", 280, 205, { align: "right" });
+    }
+    
+    doc.save(`relatorio_aguardando_pagamento_${new Date().toISOString().slice(0,10)}.pdf`);
+    mostrarNotificacao("Relatório de vendas aguardando pagamento gerado com sucesso!", "sucesso");
+}
+
+/* ============================================================
+   17. FUNÇÕES GERAIS DO SISTEMA
 ============================================================ */
 function abrirTab(aba) {
     console.log("Abrindo aba:", aba);
@@ -2305,7 +2957,7 @@ function carregarTema() {
 }
 
 /* ============================================================
-   16. DADOS DE EXEMPLO
+   18. DADOS DE EXEMPLO
 ============================================================ */
 function carregarExemplosConfirmacao() {
     if (!confirm("Isso substituirá todos os dados atuais por dados de exemplo. Deseja continuar?")) {
@@ -2411,7 +3063,7 @@ function carregarDadosExemplo() {
         { descricao: "Bolsa Tote Grande", categoria: "bolsa", preco: 110.00, tamanho: "G", marca: "Louis Vuitton", estado: "usado" }
     ];
     
-    const formasPagamento = ["dinheiro", "pix", "cartao", "link"];
+    const formasPagamento = ["dinheiro", "pix", "cartao", "link", "Aguardando Pagamento"];
     
     // Gerar 30 vendas
     const vendasExemplo = [];
@@ -2451,6 +3103,9 @@ function carregarDadosExemplo() {
         const creditoParceira = produto.preco * (configuracoes.percentualConsignatario / 100);
         const comissaoLoja = produto.preco * (configuracoes.percentualLoja / 100);
         
+        // Determinar status de pagamento
+        const statusPagamento = formaPagamento === 'Aguardando Pagamento' ? 'pendente' : 'pago';
+        
         // Criar venda
         const venda = {
             id: gerarId(),
@@ -2460,24 +3115,25 @@ function carregarDadosExemplo() {
             compradorId: comprador.id,
             desapegoId: desapego.id,
             pagamento: formaPagamento,
-            creditoConsignatario: creditoParceira,
-            comissaoLoja: comissaoLoja,
-            consignatarioId: parceira.id
+            creditoConsignatario: statusPagamento === 'pendente' ? 0 : creditoParceira,
+            comissaoLoja: statusPagamento === 'pendente' ? 0 : comissaoLoja,
+            consignatarioId: parceira.id,
+            statusPagamento: statusPagamento
         };
         
         vendasExemplo.push(venda);
+        
+        // Atualizar créditos da parceira apenas se pago
+        if (statusPagamento === 'pago') {
+            const parceiraIndex = consignatarios.findIndex(c => c.id === parceira.id);
+            if (parceiraIndex !== -1) {
+                consignatarios[parceiraIndex].credito = (consignatarios[parceiraIndex].credito || 0) + creditoParceira;
+            }
+        }
     }
     
     itens = itensExemplo;
     vendas = vendasExemplo;
-    
-    // Atualizar créditos das parceiras baseado nas vendas
-    vendas.forEach(venda => {
-        const parceira = consignatarios.find(c => c.id === venda.consignatarioId);
-        if (parceira) {
-            parceira.credito = (parceira.credito || 0) + venda.creditoConsignatario;
-        }
-    });
     
     salvarDados();
     
@@ -2491,7 +3147,7 @@ function carregarDadosExemplo() {
 }
 
 /* ============================================================
-   17. INICIALIZAÇÃO FINAL
+   19. INICIALIZAÇÃO FINAL
 ============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
     carregarTema();
